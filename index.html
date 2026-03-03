@@ -385,7 +385,7 @@
 
 <!-- ========== VIDEO START 1 ========== -->
 <div class="screen active" id="video-start-screen">
-  <video id="startVideo1" class="full-video" src="C:\Users\sahil\OneDrive\Documents\alienabduct(minigame)\assets\start1.mp4" autoplay muted loop playsinline></video>
+  <video id="startVideo1" class="full-video" src="start1.mp4" autoplay muted loop playsinline></video>
   <div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);z-index:1;pointer-events:none;"></div>
   <button class="video-start-btn" onclick="onStartGame()">▶ START GAME</button>
   <div class="video-skip-hint">[ TAP TO BEGIN ]</div>
@@ -393,7 +393,7 @@
 
 <!-- ========== VIDEO START 2 ========== -->
 <div class="screen" id="video-start2-screen">
-  <video id="startVideo2" class="full-video" src="C:\Users\sahil\OneDrive\Documents\alienabduct(minigame)\assets\start2.mp4" muted playsinline></video>
+  <video id="startVideo2" class="full-video" src="start2.mp4" muted playsinline></video>
   <div style="position:absolute;inset:0;background:rgba(0,0,0,0.15);z-index:1;pointer-events:none;"></div>
 </div>
 
@@ -452,7 +452,7 @@
     <div class="alien-panel">
       <div class="alien-label" style="z-index:1;">EXPERIMENTER Ξ-9</div>
       <div style="position:relative;width:160px;height:160px;border:2px solid var(--border);background:#000a00;overflow:hidden;z-index:1;">
-        <video id="alienVideo" src="C:\Users\sahil\OneDrive\Documents\alienabduct(minigame)\assets\alien.mp4" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;filter:saturate(1.3) hue-rotate(10deg) brightness(0.9);display:block;"></video>
+        <video id="alienVideo" src="alien.mp4" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;filter:saturate(1.3) hue-rotate(10deg) brightness(0.9);display:block;"></video>
         <div style="position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.25) 0px,rgba(0,0,0,0.25) 1px,transparent 1px,transparent 3px);"></div>
         <div style="position:absolute;inset:0;pointer-events:none;background:rgba(0,40,0,0.25);box-shadow:inset 0 0 20px rgba(0,255,65,0.3);"></div>
       </div>
@@ -500,7 +500,7 @@
 
 <!-- ========== PASS VIDEO SCREEN ========== -->
 <div class="screen" id="pass-video-screen" style="background:#000;">
-  <video id="passVideo" src="C:\Users\sahil\OneDrive\Documents\alienabduct(minigame)\assets\pass.mp4" muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+  <video id="passVideo" src="pass.mp4.mp4" muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>
   <div style="position:absolute;inset:0;pointer-events:none;background:rgba(0,0,0,0.15);z-index:1;"></div>
   <div style="position:absolute;inset:0;pointer-events:none;z-index:2;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.18) 0px,rgba(0,0,0,0.18) 1px,transparent 1px,transparent 4px);"></div>
   <div id="passLabel" style="position:absolute;top:32px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--green);text-shadow:0 0 16px var(--green);letter-spacing:6px;z-index:3;animation:blink 0.8s step-start infinite;">✓ LEVEL CLEARED</div>
@@ -1322,4 +1322,5 @@ function restart() {
 }
 </script>
 </body>
+
 </html>
