@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#000000">
+<title>SUBJECT 47 — ALIEN EXPERIMENT</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap');
+
+  :root {
+    --green: #00ff41;
+    --red: #ff0040;
+    --yellow: #ffdd00;
+    --blue: #00cfff;
+    --border: #00ff4133;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: #000;
+    color: var(--green);
+    font-family: 'Press Start 2P', monospace;
+    overflow: hidden;
+    height: 100vh;
+    height: 100dvh;
+    width: 100vw;
+    cursor: default;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body::after {
+    content:''; position:fixed; inset:0;
+    background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.15) 2px,rgba(0,0,0,0.15) 4px);
+    pointer-events:none; z-index:1000;
+  }
+
+  .noise {
+    position:fixed; inset:0; opacity:0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    pointer-events:none; z-index:999; animation: noiseAnim 0.1s steps(1) infinite;
+  }
+  @keyframes noiseAnim { to { transform: translate(2px,-2px); } }
+
+  .screen { position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; }
+  .screen.active { display:flex; }
+
+  /* ========== VIDEO START SCREENS ========== */
+  #video-start-screen, #video-start2-screen { background:#000; }
+  .full-video { width:100%; height:100%; object-fit:cover; display:block; }
+
+  .video-start-btn {
+    position:absolute; bottom:50%; left:50%;
+    transform: translate(-50%, 50%);
+    font-family:'Press Start 2P',monospace; font-size:11px;
+    padding:18px 40px; background:transparent;
+    border:2px solid var(--green); color:var(--green);
+    cursor:pointer; letter-spacing:3px;
+    text-shadow:0 0 10px var(--green);
+    box-shadow:0 0 20px var(--green), inset 0 0 20px rgba(0,255,65,0.05);
+    animation:blink 1.5s step-start infinite; z-index:10;
+  }
+  .video-start-btn:hover { background:var(--green); color:#000; animation:none; box-shadow:0 0 40px var(--green); cursor:pointer; }
+
+  .video-skip-hint {
+    position:absolute; bottom:24px; right:30px;
+    font-size:7px; color:#334433;
+    animation:blink 1.2s step-start infinite; z-index:10;
+  }
+
+  @keyframes blink { 50%{opacity:0} }
+
+  .flash-overlay {
+    position:fixed; inset:0; background:white; opacity:0;
+    z-index:500; pointer-events:none;
+  }
+
+  .flicker { animation:flicker 8s infinite; }
+  @keyframes flicker { 0%,95%,100%{opacity:1} 96%{opacity:0.4} 97%{opacity:1} 98%{opacity:0.1} 99%{opacity:0.9} }
+
+  /* ========== WAKEUP ========== */
+  #wakeup-screen { background:#000; }
+  .wakeup-pixel-art { width:100%; height:100%; position:relative; overflow:hidden; }
+  .lab-bg { position:absolute; inset:0; background:linear-gradient(180deg,#010808,#000d0d); }
+  .lab-bg::before {
+    content:''; position:absolute; inset:0;
+    background-image:linear-gradient(rgba(0,255,65,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,65,0.05) 1px,transparent 1px);
+    background-size:32px 32px;
+  }
+  .wakeup-text-container { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; padding:40px; }
+  .blurry { filter:blur(8px); animation:unblur 3s ease forwards; animation-delay:0.5s; }
+  @keyframes unblur { to{filter:blur(0)} }
+  .wakeup-msg { font-size:10px; line-height:2; text-align:center; color:var(--green); text-shadow:0 0 10px var(--green); max-width:600px; }
+  .wakeup-msg span { display:block; }
+  .vignette { position:absolute; inset:0; background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,0.9) 100%); pointer-events:none; }
+  .specimen-tag { font-size:6px; color:#ff0040; letter-spacing:4px; animation:blink 2s step-start infinite; }
+
+  /* ========== LAB SCREEN ========== */
+  #lab-screen { background:#000d08; flex-direction:column; padding:0; gap:0; }
+
+  .lab-header {
+    width:100%; display:flex; justify-content:space-between; align-items:center;
+    padding:10px 20px; border-bottom:2px solid var(--border); background:#020a02; flex-shrink:0;
+  }
+  .lab-title { font-size:7px; color:#ff0040; text-shadow:0 0 8px #ff0040; letter-spacing:3px; }
+  .lab-status { font-size:6px; color:#005500; letter-spacing:2px; }
+  .life-bar { display:flex; gap:4px; align-items:center; }
+  .life-pip { width:12px; height:12px; background:var(--red); box-shadow:0 0 4px var(--red); transition:all 0.3s; }
+  .life-pip.dead { background:#220000; box-shadow:none; }
+
+  .lab-main { flex:1; display:flex; width:100%; overflow:hidden; min-height:0; }
+
+  .alien-panel {
+    width:220px; min-width:220px; border-right:2px solid var(--border);
+    display:flex; flex-direction:column; align-items:center;
+    padding:20px 10px; gap:16px; background:#010801; position:relative; overflow:hidden;
+  }
+  .alien-panel::before {
+    content:''; position:absolute; inset:0;
+    background-image:repeating-linear-gradient(0deg,transparent,transparent 31px,rgba(0,255,65,0.04) 32px);
+  }
+  .alien-speech {
+    font-family:'VT323',monospace; font-size:16px; color:var(--green);
+    text-align:center; line-height:1.4; text-shadow:0 0 6px var(--green);
+    border:1px solid var(--border); padding:10px; background:#000a00;
+    width:100%; min-height:80px; position:relative; z-index:1;
+  }
+  .alien-label { font-size:5px; color:#003300; letter-spacing:2px; text-transform:uppercase; position:relative; z-index:1; }
+
+  .question-panel {
+    flex:1; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; padding:16px 30px; gap:14px; overflow:auto;
+  }
+
+  .q-top-row { display:flex; gap:16px; align-items:center; flex-wrap:wrap; justify-content:center; }
+  .q-counter { font-size:7px; color:#335533; letter-spacing:3px; }
+
+  .level-badge {
+    font-size:6px; letter-spacing:4px; padding:4px 12px;
+    border:1px solid; animation:blink 2s step-start infinite;
+  }
+  .level-badge.l1 { color:var(--green); border-color:var(--green); }
+  .level-badge.l2 { color:var(--blue); border-color:var(--blue); }
+  .level-badge.l3 { color:var(--yellow); border-color:var(--yellow); }
+
+  .timer-row { display:flex; align-items:center; gap:10px; width:100%; max-width:660px; }
+  .timer-label { font-size:6px; color:#335533; letter-spacing:3px; white-space:nowrap; }
+  .timer-digit { font-size:20px; font-family:'VT323',monospace; color:var(--green); text-shadow:0 0 8px var(--green); min-width:40px; text-align:center; }
+  .timer-digit.danger { color:var(--red); text-shadow:0 0 12px var(--red); animation:timerPanic 0.3s step-start infinite; }
+  .timer-bar-outer { flex:1; height:10px; background:#000d00; border:2px solid #003300; overflow:hidden; }
+  .timer-bar-inner { height:100%; width:100%; background:var(--green); box-shadow:0 0 8px var(--green); transition:width 1s linear,background 1s linear; }
+  .timer-bar-inner.danger { background:var(--red); box-shadow:0 0 10px var(--red); animation:timerPanic 0.3s step-start infinite; }
+  @keyframes timerPanic { 50%{opacity:0.5} }
+
+  .q-text {
+    font-family:'VT323',monospace; font-size:26px; color:var(--yellow);
+    text-align:center; text-shadow:0 0 10px var(--yellow); max-width:660px;
+    line-height:1.4; border-left:3px solid var(--yellow); border-right:3px solid var(--yellow);
+    padding:12px 24px;
+  }
+  .q-text.l2 { color:var(--blue); text-shadow:0 0 10px var(--blue); border-color:var(--blue); }
+
+  .options-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; width:100%; max-width:660px; }
+  .option-btn {
+    background:#010d01; border:2px solid #003300; color:var(--green);
+    font-family:'Press Start 2P',monospace; font-size:7px;
+    padding:12px 12px; cursor:pointer; text-align:left; line-height:1.6;
+    transition:all 0.1s; position:relative;
+  }
+  .option-btn::before { content:attr(data-key); position:absolute; top:6px; right:8px; font-size:7px; color:#003300; }
+  .option-btn:hover { background:#002200; border-color:var(--green); box-shadow:0 0 10px var(--green) inset,0 0 10px var(--green); color:#fff; }
+  .option-btn.correct { background:#003300; border-color:#00ff41; color:#00ff41; box-shadow:0 0 20px #00ff41 inset; animation:correctFlash 0.5s ease; }
+  @keyframes correctFlash { 50%{background:#005500} }
+  .option-btn.wrong { background:#1a0000; border-color:var(--red); color:var(--red); box-shadow:0 0 20px var(--red) inset; animation:wrongShake 0.4s ease; }
+  @keyframes wrongShake { 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+
+  .fitb-options { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; width:100%; max-width:660px; }
+  .fitb-btn {
+    background:#00080d; border:2px solid #003344; color:var(--blue);
+    font-family:'Press Start 2P',monospace; font-size:7px;
+    padding:12px 20px; cursor:pointer; line-height:1.6; transition:all 0.1s;
+  }
+  .fitb-btn:hover { background:#001a2a; border-color:var(--blue); box-shadow:0 0 10px var(--blue) inset,0 0 10px var(--blue); color:#fff; }
+  .fitb-btn.correct { background:#001a00; border-color:#00ff41; color:#00ff41; box-shadow:0 0 20px #00ff41 inset; animation:correctFlash 0.5s ease; }
+  .fitb-btn.wrong { background:#1a0000; border-color:var(--red); color:var(--red); box-shadow:0 0 20px var(--red) inset; animation:wrongShake 0.4s ease; }
+
+  .data-panel { width:180px; min-width:180px; border-left:2px solid var(--border); display:flex; flex-direction:column; padding:16px 12px; gap:12px; background:#010801; font-size:6px; overflow-y:auto; }
+  .data-title { color:#ff0040; letter-spacing:3px; border-bottom:1px solid #330000; padding-bottom:8px; text-shadow:0 0 6px #ff0040; }
+  .data-row { display:flex; justify-content:space-between; color:#334433; line-height:2; }
+  .data-val { color:var(--green); }
+  .progress-bar-outer { width:100%; height:8px; background:#001100; border:1px solid #003300; margin-top:4px; }
+  .progress-bar-inner { height:100%; background:var(--green); box-shadow:0 0 6px var(--green); transition:width 0.4s; }
+  .wrong-log { display:flex; flex-direction:column; gap:4px; margin-top:8px; }
+  .wrong-entry { color:var(--red); text-shadow:0 0 4px var(--red); font-size:5px; padding:3px; border:1px solid #220000; background:#0a0000; }
+  .dissect-warning { color:var(--red); text-shadow:0 0 8px var(--red); animation:pulse 1s ease-in-out infinite; font-size:5px; text-align:center; border:1px solid var(--red); padding:6px; background:#0a0000; display:none; }
+  @keyframes pulse { 50%{opacity:0.3} }
+
+  /* ========== LEVEL TRANSITION ========== */
+  #level-transition-screen { background:#000; gap:30px; text-align:center; padding:40px; }
+  #level-transition-screen::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse,#000d00,#000); pointer-events:none; }
+  .lvl-title { font-size:14px; color:var(--green); text-shadow:0 0 20px var(--green),0 0 40px var(--green); position:relative; z-index:1; }
+  .lvl-sub { font-size:8px; color:#446644; line-height:2.4; max-width:560px; position:relative; z-index:1; }
+  .lvl-btn {
+    font-family:'Press Start 2P',monospace; font-size:9px; padding:16px 32px;
+    background:transparent; border:2px solid var(--green); color:var(--green);
+    cursor:pointer; letter-spacing:2px; text-shadow:0 0 8px var(--green); box-shadow:0 0 8px var(--green);
+    position:relative; z-index:1; transition:all 0.2s;
+  }
+  .lvl-btn:hover { background:var(--green); color:#000; box-shadow:0 0 30px var(--green); }
+
+  /* ========== FAIL SCREEN ========== */
+  #fail-screen { background:#000; justify-content:center; }
+  .fail-title { font-size:18px; color:var(--red); text-shadow:0 0 20px var(--red),0 0 40px var(--red); animation:glitch 2s infinite; }
+  @keyframes glitch {
+    20%{transform:translate(-3px,1px);color:#ff00ff} 40%{transform:translate(3px,-1px);color:#00ffff}
+    60%{transform:translate(-1px,2px)} 80%{transform:translate(2px,-2px)} 0%,100%{transform:translate(0)}
+  }
+
+  /* ========== WIN SCREEN ========== */
+  #win-screen { background:#000; gap:30px; text-align:center; padding:40px; }
+  .win-title { font-size:14px; color:var(--green); text-shadow:0 0 20px var(--green),0 0 40px var(--green); }
+  .result-sub { font-size:8px; color:#446644; line-height:2; max-width:500px; }
+
+  .restart-btn {
+    font-family:'Press Start 2P',monospace; font-size:9px; padding:16px 32px;
+    background:transparent; border:2px solid var(--green); color:var(--green);
+    cursor:pointer; letter-spacing:2px; text-shadow:0 0 8px var(--green); box-shadow:0 0 8px var(--green); transition:all 0.2s;
+  }
+  .restart-btn:hover { background:var(--green); color:#000; box-shadow:0 0 30px var(--green); }
+
+  /* =====================================================================
+     MOBILE RESPONSIVE — targets phones (≤600px) and tablets (≤900px)
+     ===================================================================== */
+
+  /* ── Tablet (≤900px) ── */
+  @media (max-width: 900px) {
+    .alien-panel { width:160px; min-width:160px; padding:12px 8px; gap:10px; }
+    .alien-panel > div:first-child + div { width:130px!important; height:130px!important; }
+    .data-panel { width:140px; min-width:140px; padding:12px 8px; }
+    .q-text { font-size:22px; }
+    .option-btn { font-size:6px; padding:10px 8px; }
+    .fitb-btn { font-size:6px; padding:10px 14px; }
+    .lab-title { font-size:6px; letter-spacing:1px; }
+    .lvl-title { font-size:11px; }
+    .lvl-sub { font-size:7px; }
+    .fail-title { font-size:14px; }
+    .win-title { font-size:11px; }
+  }
+
+  /* ── Mobile (≤600px) — full portrait reflow ── */
+  @media (max-width: 600px) {
+
+    /* Body — allow scroll in lab screen only, prevent overscroll bounce */
+    body { overflow: hidden; touch-action: manipulation; }
+    -webkit-tap-highlight-color: transparent;
+
+    /* ── Video start button — bigger tap target ── */
+    .video-start-btn {
+      font-size:9px; padding:16px 28px; letter-spacing:2px;
+      bottom:45%; transform:translate(-50%,50%);
+    }
+    .video-skip-hint { font-size:6px; bottom:16px; right:16px; }
+
+    /* ── Wakeup screen ── */
+    .wakeup-text-container { padding:20px 16px; gap:14px; justify-content:flex-start; padding-top:40px; overflow-y:auto; }
+    .wakeup-msg { font-size:7px; line-height:1.9; max-width:100%; }
+    .wakeup-msg span:first-child { font-size:9px!important; }
+    .specimen-tag { font-size:5px; letter-spacing:2px; text-align:center; }
+    .wakeup-text-container svg:first-child { width:56px!important; height:70px!important; }
+
+    /* ── Lab header — compact ── */
+    .lab-header { padding:6px 10px; flex-wrap:wrap; gap:6px; }
+    .lab-title { font-size:5px; letter-spacing:1px; }
+    .lab-status { font-size:5px; letter-spacing:1px; }
+    .life-pip { width:10px; height:10px; }
+    #qProgress { font-size:5px; }
+
+    /* ── Lab main — STACK VERTICALLY ── */
+    .lab-main { flex-direction:column; overflow-y:auto; overflow-x:hidden; }
+
+    /* ── Alien panel — horizontal strip at top on mobile ── */
+    .alien-panel {
+      width:100%!important; min-width:0!important;
+      flex-direction:row; border-right:none; border-bottom:2px solid var(--border);
+      padding:8px 12px; gap:10px; align-items:center; flex-shrink:0;
+      height:auto; overflow:visible;
+    }
+    .alien-panel::before { display:none; }
+    /* Alien video — small square on left */
+    .alien-panel > div[style*="160px"] {
+      width:72px!important; height:72px!important;
+      min-width:72px; flex-shrink:0;
+    }
+    .alien-speech {
+      font-size:13px; min-height:unset; flex:1;
+      border-top:none; border-bottom:none; border-left:1px solid var(--border); border-right:none;
+      padding:6px 8px;
+    }
+    /* Hide experimenter label + threat on mobile to save space */
+    .alien-label { display:none; }
+
+    /* ── Question panel ── */
+    .question-panel {
+      padding:10px 12px; gap:10px;
+      justify-content:flex-start; flex:1; overflow-y:auto;
+    }
+
+    /* q-top-row — stack badge below counter */
+    .q-top-row { gap:6px; flex-direction:column; align-items:center; }
+    .q-counter { font-size:6px; letter-spacing:1px; }
+    .level-badge { font-size:5px; letter-spacing:2px; padding:3px 8px; }
+
+    /* Timer row */
+    .timer-row { gap:6px; }
+    .timer-label { font-size:5px; letter-spacing:1px; }
+    .timer-digit { font-size:18px; min-width:32px; }
+    .timer-bar-outer { height:8px; }
+
+    /* Question text */
+    .q-text { font-size:19px; padding:8px 12px; line-height:1.3; }
+
+    /* Options — single column on mobile */
+    .options-grid { grid-template-columns:1fr; gap:8px; }
+    .option-btn { font-size:7px; padding:14px 12px; line-height:1.5; }
+    .option-btn::before { font-size:6px; }
+
+    /* Fill in blank — wrap naturally, larger tap targets */
+    .fitb-options { gap:8px; }
+    .fitb-btn { font-size:7px; padding:13px 16px; }
+
+    /* ── Data panel — hidden on mobile (info is in header) ── */
+    .data-panel { display:none; }
+
+    /* ── Level transition ── */
+    #level-transition-screen { padding:24px 20px; gap:20px; }
+    .lvl-title { font-size:10px; }
+    .lvl-sub { font-size:7px; line-height:2; }
+    .lvl-btn { font-size:8px; padding:14px 24px; }
+
+    /* ── Fail screen ── */
+    #fail-screen > div > div:nth-child(2) { width:90vw!important; }
+    .fail-title { font-size:13px; }
+    .result-sub { font-size:7px; line-height:1.9; }
+
+    /* ── Win screen ── */
+    #win-screen { padding:24px 20px; gap:18px; }
+    .win-title { font-size:10px; }
+    .result-sub { font-size:7px; }
+
+    /* ── All buttons — big tap targets ── */
+    .restart-btn, .lvl-btn {
+      font-size:8px; padding:16px 28px;
+      min-height:48px; min-width:160px;
+    }
+
+    /* ── Pass video label ── */
+    #passLabel { font-size:8px!important; letter-spacing:3px!important; top:20px!important; }
+
+    /* ── Prevent text overflow everywhere ── */
+    * { word-break:break-word; }
+  }
+
+  /* ── Very small phones (≤380px) ── */
+  @media (max-width: 380px) {
+    .video-start-btn { font-size:8px; padding:14px 22px; }
+    .wakeup-msg { font-size:6px; }
+    .q-text { font-size:16px; }
+    .option-btn { font-size:6px; padding:12px 10px; }
+    .fitb-btn { font-size:6px; padding:11px 12px; }
+    .alien-speech { font-size:12px; }
+    .fail-title { font-size:11px; }
+    .lvl-title, .win-title { font-size:9px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+<div class="flash-overlay" id="flashOverlay"></div>
+<div class="static-overlay" id="staticOverlay"></div>
+
+<!-- ========== VIDEO START 1 ========== -->
+<div class="screen active" id="video-start-screen">
+  <video id="startVideo1" class="full-video" src="C:\Users\sahil\OneDrive\Documents\alienabduct(minigame)\assets\start1.mp4" autoplay muted loop playsinline></video>
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);z-index:1;pointer-events:none;"></div>
+  <button class="video-start-btn" onclick="onStartGame()">▶ START GAME</button>
+  <div class="video-skip-hint">[ TAP TO BEGIN ]</div>
+</div>
+
+<!-- ========== VIDEO START 2 ========== -->
+<div class="screen" id="video-start2-screen">
+  <video id="startVideo2" class="full-video" src="C:\Users\sahil\OneDrive\Documents\alienabduct(minigame)\assets\start2.mp4" muted playsinline></video>
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,0.15);z-index:1;pointer-events:none;"></div>
+</div>
+
+<!-- ========== WAKEUP SCREEN ========== -->
+<div class="screen" id="wakeup-screen">
+  <div class="wakeup-pixel-art">
+    <div class="lab-bg"></div>
+    <svg style="position:absolute;left:5%;top:10%;" width="60" height="80" viewBox="0 0 8 10" xmlns="http://www.w3.org/2000/svg">
+      <rect x="1" y="0" width="6" height="8" fill="#001a00" stroke="#003300" stroke-width="0.5"/><rect x="2" y="1" width="4" height="6" fill="#00ff4122"/><rect x="3" y="3" width="2" height="1" fill="#00ff41"/><rect x="0" y="8" width="8" height="2" fill="#002200"/>
+    </svg>
+    <svg style="position:absolute;right:5%;top:15%;" width="48" height="64" viewBox="0 0 6 8" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="0" width="2" height="4" fill="#004400" stroke="#006600" stroke-width="0.3"/><ellipse cx="3" cy="4.5" rx="2" ry="1.5" fill="#003300" stroke="#00ff41" stroke-width="0.3"/><rect x="2.5" y="5.5" width="1" height="2.5" fill="#003300"/><rect x="1" y="7.5" width="4" height="0.5" fill="#002200"/>
+    </svg>
+    <div class="vignette"></div>
+    <div class="wakeup-text-container blurry" id="wakeupContent">
+      <svg width="80" height="100" viewBox="0 0 10 12" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 16px #00ff41);">
+        <ellipse cx="5" cy="3" rx="4" ry="3" fill="#003300"/><rect x="2" y="4" width="6" height="5" fill="#002200"/><rect x="1" y="5" width="8" height="3" fill="#003300"/>
+        <rect x="2" y="2" width="2" height="2" fill="#00ff41"/><rect x="6" y="2" width="2" height="2" fill="#00ff41"/>
+        <rect x="2.5" y="2.5" width="1" height="1" fill="#000"/><rect x="6.5" y="2.5" width="1" height="1" fill="#000"/>
+        <rect x="3" y="5" width="4" height="1" fill="#000a00"/>
+        <rect x="0" y="5" width="1" height="3" fill="#002200"/><rect x="9" y="5" width="1" height="3" fill="#002200"/>
+        <rect x="3" y="9" width="2" height="3" fill="#002200"/><rect x="5" y="9" width="2" height="3" fill="#002200"/>
+      </svg>
+      <div class="wakeup-msg">
+        <span style="color:#ff0040;font-size:12px;">⚠ SUBJECT 47 — REGAINING CONSCIOUSNESS</span>
+        <span style="margin-top:16px;">YOUR HEAD THROBS. COLD METAL TABLE.</span>
+        <span>TUBES. MACHINES. A BLINDING WHITE ROOM.</span>
+        <span style="margin-top:12px;color:#ffdd00;">ALIEN ENTITY APPROACHES...</span>
+        <span style="margin-top:16px;font-size:8px;color:#00ff41;">"WE STUDY HUMAN LANGUAGE UNIT."</span>
+        <span style="font-size:8px;color:#00ff41;">"ANSWER CORRECTLY OR FACE DISSECTION."</span>
+        <span style="font-size:8px;color:#00ff41;">"4 FAILURES = DISSECTION ZONE."</span>
+        <span style="font-size:8px;color:#00ff41;">"3 LEVELS. SURVIVE THEM ALL."</span>
+      </div>
+      <div class="specimen-tag">SPECIMEN TAG: H-47 | PLANET: EARTH | STATUS: TEST SUBJECT</div>
+      <button class="restart-btn" onclick="startLab()" style="margin-top:10px;">BEGIN EXPERIMENT</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== LAB SCREEN ========== -->
+<div class="screen" id="lab-screen">
+  <div class="lab-header">
+    <div class="lab-title flicker" id="labTitleText">⚗ XENOLINGUISTICS LAB — SECTOR 7</div>
+    <div style="display:flex;gap:16px;align-items:center;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div class="lab-status">FAILURE TOLERANCE</div>
+        <div class="life-bar" id="lifeBar">
+          <div class="life-pip" id="pip0"></div><div class="life-pip" id="pip1"></div>
+          <div class="life-pip" id="pip2"></div><div class="life-pip" id="pip3"></div>
+        </div>
+      </div>
+      <div class="lab-status" id="qProgress">Q 1 / 10</div>
+    </div>
+  </div>
+  <div class="lab-main">
+    <div class="alien-panel">
+      <div class="alien-label" style="z-index:1;">EXPERIMENTER Ξ-9</div>
+      <div style="position:relative;width:160px;height:160px;border:2px solid var(--border);background:#000a00;overflow:hidden;z-index:1;">
+        <video id="alienVideo" src="C:\Users\sahil\OneDrive\Documents\alienabduct(minigame)\assets\alien.mp4" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;filter:saturate(1.3) hue-rotate(10deg) brightness(0.9);display:block;"></video>
+        <div style="position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.25) 0px,rgba(0,0,0,0.25) 1px,transparent 1px,transparent 3px);"></div>
+        <div style="position:absolute;inset:0;pointer-events:none;background:rgba(0,40,0,0.25);box-shadow:inset 0 0 20px rgba(0,255,65,0.3);"></div>
+      </div>
+      <div class="alien-speech" id="alienSpeech">INITIATING LANGUAGE ANALYSIS PROTOCOL...</div>
+      <div class="alien-label">THREAT: <span id="threatLevel" style="color:var(--yellow);">LOW</span></div>
+    </div>
+
+    <div class="question-panel">
+      <div class="q-top-row">
+        <div class="q-counter" id="qCounter">QUESTION 001 OF 010</div>
+        <div class="level-badge l1" id="levelBadge">LEVEL 1 — VOCABULARY</div>
+      </div>
+      <div class="timer-row">
+        <div class="timer-label">TIME:</div>
+        <div class="timer-digit" id="timerDigit">10</div>
+        <div class="timer-bar-outer"><div class="timer-bar-inner" id="timerBar"></div></div>
+      </div>
+      <div class="q-text q-animate" id="qText">LOADING...</div>
+      <div id="answersContainer"></div>
+    </div>
+
+    <div class="data-panel">
+      <div class="data-title">EXPERIMENT LOG</div>
+      <div class="data-row"><span>SUBJECT</span><span class="data-val">H-47</span></div>
+      <div class="data-row"><span>LEVEL</span><span class="data-val" id="levelNum">1</span></div>
+      <div class="data-row"><span>CORRECT</span><span class="data-val" id="correctCount">0</span></div>
+      <div class="data-row"><span>ERRORS</span><span class="data-val" id="wrongCount" style="color:var(--red);">0</span></div>
+      <div class="data-row"><span>STATUS</span><span class="data-val" id="statusText">STABLE</span></div>
+      <div style="margin-top:8px;">
+        <div style="color:#334433;margin-bottom:4px;">PROGRESS</div>
+        <div class="progress-bar-outer"><div class="progress-bar-inner" id="progressBar" style="width:0%"></div></div>
+      </div>
+      <div class="dissect-warning" id="dissectWarning">⚠ DISSECTION IMMINENT</div>
+      <div class="wrong-log" id="wrongLog"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== LEVEL TRANSITION ========== -->
+<div class="screen" id="level-transition-screen">
+  <div class="lvl-title" id="transTitle">LEVEL 1 COMPLETE</div>
+  <div class="lvl-sub" id="transSub"></div>
+  <button class="lvl-btn" id="transBtn" onclick="startNextLevel()">PROCEED →</button>
+</div>
+
+<!-- ========== PASS VIDEO SCREEN ========== -->
+<div class="screen" id="pass-video-screen" style="background:#000;">
+  <video id="passVideo" src="C:\Users\sahil\OneDrive\Documents\alienabduct(minigame)\assets\pass.mp4" muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+  <div style="position:absolute;inset:0;pointer-events:none;background:rgba(0,0,0,0.15);z-index:1;"></div>
+  <div style="position:absolute;inset:0;pointer-events:none;z-index:2;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.18) 0px,rgba(0,0,0,0.18) 1px,transparent 1px,transparent 4px);"></div>
+  <div id="passLabel" style="position:absolute;top:32px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--green);text-shadow:0 0 16px var(--green);letter-spacing:6px;z-index:3;animation:blink 0.8s step-start infinite;">✓ LEVEL CLEARED</div>
+</div>
+
+<!-- ========== FAIL SCREEN ========== -->
+<div class="screen" id="fail-screen">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,#1a0000,#000);pointer-events:none;"></div>
+  <div style="position:absolute;inset:0;pointer-events:none;z-index:1;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.2) 0px,rgba(0,0,0,0.2) 1px,transparent 1px,transparent 4px);"></div>
+  <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;padding:28px 40px;width:100%;max-width:800px;">
+    <div class="fail-title">DISSECTION INITIATED</div>
+    <div style="position:relative;width:480px;max-width:90vw;border:3px solid #ff0040;box-shadow:0 0 30px #ff004088,0 0 60px #ff004033;overflow:hidden;">
+      <video id="dissectionVideo" src="C:\Users\sahil\OneDrive\Documents\alienabduct(minigame)\assets\dissection.mp4" autoplay loop muted playsinline style="width:100%;display:block;filter:brightness(0.75) contrast(1.3) saturate(0.7);"></video>
+      <div style="position:absolute;inset:0;pointer-events:none;background:rgba(120,0,0,0.3);"></div>
+      <div style="position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.25) 0px,rgba(0,0,0,0.25) 1px,transparent 1px,transparent 3px);"></div>
+    </div>
+    <div class="result-sub">
+      YOUR FAILURES EXCEEDED THE TOLERANCE THRESHOLD.<br>
+      YOU HAVE BEEN MOVED TO DISSECTION ZONE 4-B.<br><br>
+      <span style="color:#ff0040;">THE BLADE IS COLD.</span><br>
+      <span style="color:#440000;font-size:6px;">EXPERIMENT LOG: SUBJECT H-47 — TERMINATED.</span>
+    </div>
+    <button class="restart-btn" style="border-color:var(--red);color:var(--red);box-shadow:0 0 8px var(--red);" onclick="restart()">TRY AGAIN</button>
+  </div>
+</div>
+
+<!-- ========== WIN SCREEN ========== -->
+<div class="screen" id="win-screen">
+  <svg style="filter:drop-shadow(0 0 20px #00ff41);" width="100" height="80" viewBox="0 0 12 10" xmlns="http://www.w3.org/2000/svg">
+    <rect x="1" y="2" width="2" height="6" fill="#00ff41"/><rect x="3" y="4" width="2" height="4" fill="#00ff41"/><rect x="5" y="1" width="2" height="7" fill="#00ff41"/><rect x="7" y="3" width="2" height="5" fill="#00ff41"/><rect x="9" y="0" width="2" height="8" fill="#00ff41"/>
+  </svg>
+  <div class="win-title">ALL 3 LEVELS CLEARED</div>
+  <div class="result-sub">
+    SUBJECT H-47 HAS DEMONSTRATED FULL<br>HUMAN LINGUISTIC CAPABILITY.<br><br>
+    <span style="color:#ffdd00;">THE ALIENS RELEASE YOU... FOR NOW.</span><br>
+    <span style="color:#446644;font-size:6px;">THEY WILL RETURN. THEY ALWAYS DO.</span>
+  </div>
+  <div style="font-size:7px;color:#335533;margin-top:8px;" id="winScore"></div>
+  <button class="restart-btn" onclick="restart()">PLAY AGAIN</button>
+</div>
+
+<script>
+// ===== VIDEO INTRO =====
+function onStartGame() {
+  playSound('start');
+  startBgMusic();
+  document.getElementById('startVideo1').pause();
+  showScreen('video-start2-screen');
+  const s2 = document.getElementById('startVideo2');
+  s2.currentTime = 0;
+  s2.play().catch(() => {});
+  s2.onended = () => triggerLightBang();
+  // start2 is 8 seconds — fallback after 9s
+  setTimeout(() => {
+    if (document.getElementById('video-start2-screen').classList.contains('active')) {
+      triggerLightBang();
+    }
+  }, 9000);
+}
+
+function triggerLightBang() {
+  playSound('meteor');
+  // Flash white — the light bang — then go to wakeup
+  const flash = document.getElementById('flashOverlay');
+  flash.style.transition = 'opacity 0.1s';
+  flash.style.opacity = '1';
+  setTimeout(() => {
+    flash.style.transition = 'opacity 3s';
+    flash.style.opacity = '0';
+    showScreen('wakeup-screen');
+  }, 1000);
+}
+
+const level1Bank = [
+  {q:"WHAT DOES 'EPHEMERAL' MEAN?",options:["LASTING FOREVER","SHORT-LIVED / TEMPORARY","EXTREMELY LARGE","DEEPLY SAD"],correct:1,alien:"DEFINE TEMPORAL EXISTENCE UNIT WORD..."},
+  {q:"WHICH WORD MEANS 'TO MAKE WORSE'?",options:["AMELIORATE","MITIGATE","EXACERBATE","ALLEVIATE"],correct:2,alien:"NEGATIVE CHANGE DESCRIPTOR... SCAN INITIATED."},
+  {q:"WHAT IS THE MEANING OF 'UBIQUITOUS'?",options:["RARE AND UNIQUE","FOUND EVERYWHERE","EXTREMELY UGLY","VERY FAST"],correct:1,alien:"PRESENCE DISTRIBUTION ANALYSIS PROCESSING."},
+  {q:"WHICH WORD MEANS 'TO CANCEL OR REVOKE'?",options:["RATIFY","ABROGATE","PROMULGATE","SANCTION"],correct:1,alien:"NULLIFICATION VERB IDENTIFICATION REQUIRED."},
+  {q:"'PERFIDIOUS' MOST NEARLY MEANS:",options:["LOYAL AND TRUE","TREACHEROUS / DECEITFUL","PERFECT IN EVERY WAY","EASILY FRIGHTENED"],correct:1,alien:"TRUST BETRAYAL CONCEPT VOCABULARY CHECK."},
+  {q:"WHAT DOES 'LOQUACIOUS' MEAN?",options:["SILENT","TENDING TO TALK TOO MUCH","LOGICALLY SOUND","EXTREMELY HUNGRY"],correct:1,alien:"VERBAL OUTPUT FREQUENCY MEASUREMENT WORD."},
+  {q:"WHICH WORD MEANS 'SHOWING OFF KNOWLEDGE'?",options:["HUMBLE","RETICENT","PEDANTIC","LACONIC"],correct:2,alien:"KNOWLEDGE DISPLAY BEHAVIORAL PATTERN WORD."},
+  {q:"WHAT DOES 'INSIDIOUS' MEAN?",options:["HARMLESS AND GENTLE","GRADUALLY AND SECRETLY HARMFUL","EXTREMELY OBVIOUS","FULL OF WISDOM"],correct:1,alien:"CONCEALED THREAT DESCRIPTOR SCAN ACTIVE."},
+  {q:"'SANGUINE' MOST NEARLY MEANS:",options:["PESSIMISTIC","OPTIMISTIC AND POSITIVE","RELATING TO BLOOD","EXTREMELY COLD"],correct:1,alien:"EMOTIONAL OUTLOOK POLARITY CLASSIFICATION."},
+  {q:"WHAT DOES 'MELANCHOLY' MEAN?",options:["EXTREME JOY","DEEP SADNESS","VIOLENT ANGER","MILD CONFUSION"],correct:1,alien:"HUMAN EMOTIONAL NEGATIVE STATE ANALYSIS."},
+  {q:"WHICH WORD MEANS 'EXTREMELY POOR'?",options:["OPULENT","AFFLUENT","DESTITUTE","LAVISH"],correct:2,alien:"RESOURCE DEPRIVATION DESCRIPTOR REQUIRED."},
+  {q:"WHAT DOES 'TENACIOUS' MEAN?",options:["FRAGILE","PERSISTENT / DETERMINED","FORGETFUL","COWARDLY"],correct:1,alien:"PERSEVERANCE BEHAVIORAL TRAIT SCAN."},
+  {q:"'AMBIGUOUS' MOST NEARLY MEANS:",options:["CLEARLY DEFINED","HAVING MULTIPLE MEANINGS","EXTREMELY LARGE","WELL-ORGANIZED"],correct:1,alien:"MULTI-INTERPRETATION LINGUISTIC PATTERN."},
+  {q:"WHAT DOES 'VERBOSE' MEAN?",options:["BRIEF AND CONCISE","USING TOO MANY WORDS","EXTREMELY QUIET","VERY ACCURATE"],correct:1,alien:"WORD EXCESS COMMUNICATION PATTERN ANALYSIS."},
+  {q:"WHICH WORD MEANS 'TO PRAISE HIGHLY'?",options:["CRITICIZE","BELITTLE","EXTOL","CONDEMN"],correct:2,alien:"POSITIVE EVALUATION EXPRESSION SCAN."},
+  {q:"WHAT DOES 'CANDID' MEAN?",options:["DECEITFUL","HONEST AND DIRECT","SECRETIVE","INDIFFERENT"],correct:1,alien:"TRUTHFUL COMMUNICATION TRAIT MEASUREMENT."},
+  {q:"'INEVITABLE' MOST NEARLY MEANS:",options:["EASILY AVOIDED","CERTAIN TO HAPPEN","UNLIKELY","DANGEROUS"],correct:1,alien:"CERTAINTY PROBABILITY CALCULATION COMPLETE."},
+  {q:"WHAT DOES 'OBSOLETE' MEAN?",options:["BRAND NEW","NO LONGER USED","VERY POPULAR","HIGHLY EFFICIENT"],correct:1,alien:"TEMPORAL RELEVANCE DECAY MEASUREMENT."},
+  {q:"WHICH WORD MEANS 'CALM AND PEACEFUL'?",options:["TURBULENT","CHAOTIC","SERENE","AGGRESSIVE"],correct:2,alien:"TRANQUILITY STATE DESCRIPTOR ANALYSIS."},
+  {q:"WHAT DOES 'ENIGMATIC' MEAN?",options:["WELL UNDERSTOOD","MYSTERIOUS / PUZZLING","EXTREMELY LOUD","PERFECTLY CLEAR"],correct:1,alien:"MYSTERY COMPREHENSION DIFFICULTY SCANNING."},
+  {q:"'PRAGMATIC' MOST NEARLY MEANS:",options:["IDEALISTIC","PRACTICAL AND REALISTIC","EMOTIONAL","THEORETICAL"],correct:1,alien:"PRACTICAL REASONING FRAMEWORK ANALYSIS."},
+  {q:"WHAT DOES 'RESILIENT' MEAN?",options:["EASILY BROKEN","ABLE TO RECOVER QUICKLY","VERY RIGID","PERMANENTLY DAMAGED"],correct:1,alien:"RECOVERY CAPACITY BIOLOGICAL SCAN."},
+  {q:"WHICH WORD MEANS 'TO MAKE CLEAR'?",options:["OBSCURE","CONFUSE","ELUCIDATE","COMPLICATE"],correct:2,alien:"CLARITY ENHANCEMENT OPERATION REQUIRED."},
+  {q:"WHAT DOES 'ZEALOUS' MEAN?",options:["LAZY","VERY ENTHUSIASTIC / PASSIONATE","INDIFFERENT","HESITANT"],correct:1,alien:"ENTHUSIASM INTENSITY LEVEL MEASUREMENT."},
+  {q:"'NONCHALANT' MOST NEARLY MEANS:",options:["HIGHLY AGITATED","CASUALLY CALM AND INDIFFERENT","DEEPLY CONCERNED","EXTREMELY ENERGETIC"],correct:1,alien:"INDIFFERENCE BEHAVIORAL PATTERN SCAN."}
+];
+
+const level2Bank = [
+  {q:"THE SCIENTIST MADE AN ___ DISCOVERY THAT CHANGED EVERYTHING.",options:["TRIVIAL","EPOCHAL","BORING","DELAYED"],correct:1,alien:"FILL BLANK UNIT. VOCABULARY INSERTION TEST."},
+  {q:"HIS ___ ATTITUDE MADE IT IMPOSSIBLE TO ARGUE WITH HIM.",options:["FLEXIBLE","OPEN","OBSTINATE","CHEERFUL"],correct:2,alien:"BEHAVIORAL GAP ANALYSIS REQUIRED."},
+  {q:"THE ANCIENT RUINS WERE ___ — ALMOST FORGOTTEN BY TIME.",options:["PRISTINE","MODERN","DECREPIT","CELEBRATED"],correct:2,alien:"TEMPORAL DECAY STATE CLASSIFICATION."},
+  {q:"SHE SPOKE WITH SUCH ___ THAT NO ONE DOUBTED HER.",options:["VAGUENESS","CONVICTION","HESITATION","CONFUSION"],correct:1,alien:"SPEECH CONFIDENCE DESCRIPTOR REQUIRED."},
+  {q:"THE DETECTIVE USED ___ REASONING TO SOLVE THE CASE.",options:["RANDOM","DEDUCTIVE","EMOTIONAL","IMPULSIVE"],correct:1,alien:"LOGICAL PROCESSING METHOD IDENTIFICATION."},
+  {q:"THE CROWD FELL INTO ___ SILENCE AFTER THE ANNOUNCEMENT.",options:["JOYFUL","STUNNED","BORED","CHEERFUL"],correct:1,alien:"REACTION STATE DESCRIPTOR SCAN ACTIVE."},
+  {q:"HE HAD AN ___ FEAR OF DARKNESS SINCE CHILDHOOD.",options:["RATIONAL","IRRATIONAL","OCCASIONAL","IMAGINED"],correct:1,alien:"FEAR CLASSIFICATION ORIGIN SCANNING."},
+  {q:"THE CONTRACT WAS ___ BECAUSE IT LACKED A SIGNATURE.",options:["VALID","VOID","BINDING","COMPLETE"],correct:1,alien:"LEGAL DOCUMENT STATUS ANALYSIS REQUIRED."},
+  {q:"HER ___ REMARKS OFTEN HURT PEOPLE UNINTENTIONALLY.",options:["KIND","THOUGHTLESS","DELIBERATE","CALCULATED"],correct:1,alien:"SPEECH IMPACT BEHAVIORAL STUDY."},
+  {q:"THE EXPLORER SET OFF ON AN ___ JOURNEY INTO THE UNKNOWN.",options:["MUNDANE","AUDACIOUS","ROUTINE","FAMILIAR"],correct:1,alien:"BRAVERY COEFFICIENT IN EXPEDITION SCAN."},
+  {q:"THE PATIENT REQUIRED ___ CARE AROUND THE CLOCK.",options:["OCCASIONAL","VIGOROUS","CONSTANT","MINIMAL"],correct:2,alien:"MEDICAL ATTENTION FREQUENCY ANALYSIS."},
+  {q:"THE PAINTING HAD AN ___ QUALITY THAT DREW EVERYONE IN.",options:["REPULSIVE","ETHEREAL","ORDINARY","UGLY"],correct:1,alien:"AESTHETIC ATTRACTION COEFFICIENT SCAN."},
+  {q:"HE GAVE A ___ ACCOUNT OF WHAT HAPPENED AT THE SCENE.",options:["VAGUE","INACCURATE","LUCID","CONFUSING"],correct:2,alien:"WITNESS CLARITY REPORT ANALYSIS."},
+  {q:"THE POLITICIAN MADE AN ___ PROMISE TO THE CITIZENS.",options:["EMPTY","SINCERE","FORGOTTEN","IGNORED"],correct:1,alien:"POLITICAL COMMITMENT AUTHENTICITY SCAN."},
+  {q:"THE CHILD SHOWED ___ TALENT FOR MUSIC AT A YOUNG AGE.",options:["ZERO","PRODIGIOUS","AVERAGE","DECLINING"],correct:1,alien:"EARLY ABILITY IDENTIFICATION PROTOCOL."},
+  {q:"THE CRISIS WAS ___ BY THE TEAM'S QUICK RESPONSE.",options:["WORSENED","IGNORED","AVERTED","FORGOTTEN"],correct:2,alien:"CRISIS RESOLUTION OUTCOME ANALYSIS."},
+  {q:"HER ___ SMILE LIT UP EVERY ROOM SHE ENTERED.",options:["GLOOMY","RADIANT","FORCED","FAINT"],correct:1,alien:"FACIAL EXPRESSION ENERGY SCAN."},
+  {q:"THE TREATY WAS ___ AFTER BOTH NATIONS SIGNED IT.",options:["REJECTED","NULLIFIED","RATIFIED","IGNORED"],correct:2,alien:"DIPLOMATIC AGREEMENT STATUS ANALYSIS."},
+  {q:"THE OLD LIBRARY HAD A ___ ATMOSPHERE OF QUIET LEARNING.",options:["CHAOTIC","SCHOLARLY","NOISY","COMMERCIAL"],correct:1,alien:"ENVIRONMENTAL TONE CLASSIFICATION."},
+  {q:"THE VOLCANO GAVE NO ___ SIGNS BEFORE IT ERUPTED.",options:["CLEAR","WARNING","VISIBLE","OBVIOUS"],correct:1,alien:"GEOLOGICAL SIGNAL ABSENCE CLASSIFICATION."},
+  {q:"HIS ___ KNOWLEDGE OF SCIENCE IMPRESSED THE PROFESSORS.",options:["SHALLOW","ENCYCLOPEDIC","LIMITED","OUTDATED"],correct:1,alien:"KNOWLEDGE DEPTH MEASUREMENT REQUIRED."},
+  {q:"THE STORM CAUSED ___ DAMAGE TO THE COASTAL TOWNS.",options:["MINIMAL","NEGLIGIBLE","CATASTROPHIC","SLIGHT"],correct:2,alien:"DESTRUCTION SCALE ASSESSMENT PROTOCOL."},
+  {q:"SHE REMAINED ___ UNDER PRESSURE, NEVER LOSING FOCUS.",options:["ANXIOUS","COMPOSED","FRANTIC","SCATTERED"],correct:1,alien:"STRESS RESPONSE BEHAVIORAL ANALYSIS."},
+  {q:"THE JUDGE'S RULING WAS SEEN AS ___ AND FAIR BY ALL.",options:["BIASED","IMPARTIAL","CORRUPT","RUSHED"],correct:1,alien:"JUSTICE IMPARTIALITY MEASUREMENT SCAN."},
+  {q:"THE ANCIENT TEXT WAS WRITTEN IN ___ SYMBOLS NO ONE COULD READ.",options:["SIMPLE","MODERN","CRYPTIC","COLORFUL"],correct:2,alien:"SYMBOLIC COMPREHENSION DIFFICULTY ANALYSIS."}
+];
+
+const level3Bank = [
+  {q:"'PERSPICACIOUS' MOST NEARLY MEANS:",options:["CONFUSED","HAVING KEEN INSIGHT","EXTREMELY LOUD","RECKLESS"],correct:1,alien:"COGNITIVE ACUITY MEASUREMENT FINAL LEVEL."},
+  {q:"WHAT DOES 'SYCOPHANT' MEAN?",options:["A BRAVE HERO","A FLATTERER WHO SEEKS FAVOR","A JUST RULER","AN HONEST CRITIC"],correct:1,alien:"SOCIAL MANIPULATION BEHAVIOR CLASSIFICATION."},
+  {q:"WHICH WORD MEANS 'TO SCATTER OR DISPERSE'?",options:["CONGREGATE","AMASS","DISSIPATE","ACCUMULATE"],correct:2,alien:"PARTICLE DISTRIBUTION PATTERN ANALYSIS."},
+  {q:"'TRUCULENT' MOST NEARLY MEANS:",options:["PEACEFUL","EAGER TO ARGUE / AGGRESSIVE","VERY SLEEPY","GENEROUS"],correct:1,alien:"AGGRESSION BEHAVIORAL TRAIT SCAN."},
+  {q:"WHAT DOES 'EQUIVOCAL' MEAN?",options:["CRYSTAL CLEAR","AMBIGUOUS / OPEN TO INTERPRETATION","MATHEMATICALLY EQUAL","EXTREMELY FAIR"],correct:1,alien:"LINGUISTIC AMBIGUITY FREQUENCY SCAN."},
+  {q:"WHICH WORD MEANS 'LASTING ONLY A SHORT TIME'?",options:["PERPETUAL","ENDURING","TRANSIENT","PERMANENT"],correct:2,alien:"DURATION SHORTNESS CLASSIFICATION REQUIRED."},
+  {q:"'INIMICAL' MOST NEARLY MEANS:",options:["FRIENDLY","HOSTILE / HARMFUL","NEUTRAL","BENEFICIAL"],correct:1,alien:"HOSTILITY VECTOR ANALYSIS COMPLETE."},
+  {q:"WHAT DOES 'MAGNANIMOUS' MEAN?",options:["PETTY AND SPITEFUL","VERY LARGE","GENEROUS AND NOBLE","EXTREMELY ANGRY"],correct:2,alien:"GENEROSITY NOBILITY COEFFICIENT SCAN."},
+  {q:"WHICH WORD MEANS 'IMPOSSIBLE TO DENY OR DISPROVE'?",options:["DUBIOUS","QUESTIONABLE","IRREFUTABLE","UNCERTAIN"],correct:2,alien:"LOGICAL CERTAINTY VERIFICATION REQUIRED."},
+  {q:"'OBSEQUIOUS' MOST NEARLY MEANS:",options:["ASSERTIVE","EXCESSIVELY COMPLIANT / SERVILE","REBELLIOUS","INDIFFERENT"],correct:1,alien:"SUBMISSION COMPLIANCE BEHAVIORAL SCAN."},
+  {q:"WHAT DOES 'RECALCITRANT' MEAN?",options:["EASILY PERSUADED","STUBBORNLY RESISTANT","HIGHLY LOGICAL","EXTREMELY TIRED"],correct:1,alien:"RESISTANCE BEHAVIORAL COEFFICIENT ANALYSIS."},
+  {q:"WHICH WORD MEANS 'EXPRESSING MUCH IN FEW WORDS'?",options:["VERBOSE","LOQUACIOUS","TERSE","ELABORATE"],correct:2,alien:"LINGUISTIC COMPRESSION EFFICIENCY SCAN."},
+  {q:"'VERACIOUS' MOST NEARLY MEANS:",options:["DISHONEST","TRUTHFUL AND ACCURATE","RAVENOUSLY HUNGRY","VERY COURAGEOUS"],correct:1,alien:"TRUTH FIDELITY MEASUREMENT ACTIVE."},
+  {q:"WHAT DOES 'PHLEGMATIC' MEAN?",options:["EASILY EXCITED","HAVING AN UNEMOTIONAL CALM MANNER","VERY SICK","INTENSELY PASSIONATE"],correct:1,alien:"EMOTIONAL SUPPRESSION PROFILE SCAN."},
+  {q:"WHICH WORD MEANS 'RELATING TO THE STARS'?",options:["TERRESTRIAL","AQUATIC","ASTRAL","SUBTERRANEAN"],correct:2,alien:"CELESTIAL BODY DESCRIPTOR CLASSIFICATION."},
+  {q:"'INVETERATE' MOST NEARLY MEANS:",options:["NEW TO A HABIT","DEEPLY ESTABLISHED BY HABIT","CURED COMPLETELY","RECENTLY ACQUIRED"],correct:1,alien:"HABITUAL BEHAVIOR DURATION ANALYSIS."},
+  {q:"WHAT DOES 'LIMPID' MEAN?",options:["MURKY AND DARK","CLEAR AND TRANSPARENT","LOUD AND HARSH","THICK AND HEAVY"],correct:1,alien:"TRANSPARENCY OPTICAL PROPERTY SCAN."},
+  {q:"WHICH WORD MEANS 'TO INTIMIDATE OR OVERAWE'?",options:["ENCOURAGE","SUPPORT","BROWBEAT","COMFORT"],correct:2,alien:"PSYCHOLOGICAL PRESSURE TACTIC ANALYSIS."},
+  {q:"'PELLUCID' MOST NEARLY MEANS:",options:["COMPLETELY OPAQUE","EASILY UNDERSTOOD / TRANSPARENT","EXTREMELY COLD","HIGHLY TOXIC"],correct:1,alien:"COMPREHENSION CLARITY FINAL ASSESSMENT."},
+  {q:"WHAT DOES 'FRACTIOUS' MEAN?",options:["CALM AND EASYGOING","IRRITABLE AND ARGUMENTATIVE","MATHEMATICALLY PARTIAL","VERY HEALTHY"],correct:1,alien:"IRRITABILITY INDEX MEASUREMENT SCAN."},
+  {q:"WHICH WORD MEANS 'EXTREMELY CAREFUL ABOUT DETAILS'?",options:["CARELESS","METICULOUS","HASTY","INDIFFERENT"],correct:1,alien:"PRECISION BEHAVIORAL COEFFICIENT SCAN."},
+  {q:"'ABSTRUSE' MOST NEARLY MEANS:",options:["SIMPLE AND OBVIOUS","DIFFICULT TO UNDERSTAND","VERY COMMON","WIDELY KNOWN"],correct:1,alien:"COMPLEXITY COMPREHENSION BARRIER ANALYSIS."},
+  {q:"WHAT DOES 'LUGUBRIOUS' MEAN?",options:["EXTREMELY FUNNY","MOURNFUL / EXCESSIVELY SAD","FULL OF ENERGY","BRIGHT AND COLORFUL"],correct:1,alien:"SORROW INTENSITY CLASSIFICATION REQUIRED."},
+  {q:"WHICH WORD MEANS 'TO STRENGTHEN OR SUPPORT'?",options:["UNDERMINE","WEAKEN","BUTTRESS","REMOVE"],correct:2,alien:"STRUCTURAL REINFORCEMENT ACTION SCAN."},
+  {q:"'PROPITIOUS' MOST NEARLY MEANS:",options:["UNFAVORABLE","GIVING GOOD SIGNS / FAVORABLE","EXTREMELY RELIGIOUS","VERY COLD"],correct:1,alien:"AUSPICIOUSNESS PROBABILITY ANALYSIS FINAL."}
+];
+
+// ===== STATE =====
+let currentLevel = 1;
+let currentQ = 0;
+let levelQuestions = [];
+let wrongs = 0;
+let corrects = 0;
+let totalCorrects = 0;
+let answered = false;
+const MAX_WRONGS = 4;
+const QS_PER_LEVEL = 10;
+let timerInterval = null;
+let timeLeft = 15;
+const TIMER_SECS = 15;
+
+// ===== HELPERS =====
+function pickRandom(bank, n) {
+  return [...bank].sort(() => Math.random() - 0.5).slice(0, n).map(shuffleOptions);
+}
+
+// Randomly repositions the correct answer among the options
+function shuffleOptions(q) {
+  const correctText = q.options[q.correct];
+  const shuffled = [...q.options].sort(() => Math.random() - 0.5);
+  return { ...q, options: shuffled, correct: shuffled.indexOf(correctText) };
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ===== SOUND ENGINE (Web Audio API — no external files needed) =====
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function playSound(type) {
+  try {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    if (type === 'correct') {
+      [440,660].forEach((freq,i) => {
+        const o=ctx.createOscillator(),g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);o.type='sine';
+        o.frequency.setValueAtTime(freq,now+i*0.12);
+        g.gain.setValueAtTime(0,now+i*0.12);
+        g.gain.linearRampToValueAtTime(0.3,now+i*0.12+0.02);
+        g.gain.exponentialRampToValueAtTime(0.001,now+i*0.12+0.35);
+        o.start(now+i*0.12);o.stop(now+i*0.12+0.4);
+      });
+    } else if (type === 'wrong') {
+      const o=ctx.createOscillator(),g=ctx.createGain(),dist=ctx.createWaveShaper();
+      const curve=new Float32Array(256);for(let i=0;i<256;i++) curve[i]=i<128?-1:1;
+      dist.curve=curve;o.connect(dist);dist.connect(g);g.connect(ctx.destination);
+      o.type='sawtooth';o.frequency.setValueAtTime(220,now);
+      o.frequency.exponentialRampToValueAtTime(80,now+0.4);
+      g.gain.setValueAtTime(0.25,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.45);
+      o.start(now);o.stop(now+0.5);
+    } else if (type === 'timeout') {
+      [400,300,200].forEach((freq,i) => {
+        const o=ctx.createOscillator(),g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);o.type='square';o.frequency.value=freq;
+        g.gain.setValueAtTime(0.15,now+i*0.15);g.gain.exponentialRampToValueAtTime(0.001,now+i*0.15+0.12);
+        o.start(now+i*0.15);o.stop(now+i*0.15+0.15);
+      });
+    } else if (type === 'levelpass') {
+      [262,330,392,523,659].forEach((freq,i) => {
+        const o=ctx.createOscillator(),g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);o.type='triangle';o.frequency.value=freq;
+        g.gain.setValueAtTime(0,now+i*0.1);
+        g.gain.linearRampToValueAtTime(0.25,now+i*0.1+0.04);
+        g.gain.exponentialRampToValueAtTime(0.001,now+i*0.1+0.35);
+        o.start(now+i*0.1);o.stop(now+i*0.1+0.4);
+      });
+    } else if (type === 'dissect') {
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);o.type='sawtooth';
+      o.frequency.setValueAtTime(55,now);o.frequency.linearRampToValueAtTime(40,now+1.5);
+      g.gain.setValueAtTime(0.3,now);g.gain.exponentialRampToValueAtTime(0.001,now+1.8);
+      o.start(now);o.stop(now+2);
+    } else if (type === 'tick') {
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);o.type='square';o.frequency.value=800;
+      g.gain.setValueAtTime(0.06,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.04);
+      o.start(now);o.stop(now+0.05);
+    } else if (type === 'danger') {
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);o.type='square';o.frequency.value=1200;
+      g.gain.setValueAtTime(0.15,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.1);
+      o.start(now);o.stop(now+0.12);
+    } else if (type === 'win') {
+      [262,330,392,330,392,523].forEach((freq,i) => {
+        const o=ctx.createOscillator(),g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);o.type='triangle';o.frequency.value=freq;
+        const t=now+i*0.13;
+        g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.28,t+0.04);
+        g.gain.exponentialRampToValueAtTime(0.001,t+0.4);o.start(t);o.stop(t+0.45);
+      });
+
+    // ---- NEW SOUNDS ----
+    } else if (type === 'start') {
+      // Cinematic low boom + rising alien shimmer
+      // Deep sub boom
+      const boom=ctx.createOscillator(),bg=ctx.createGain();
+      boom.connect(bg);bg.connect(ctx.destination);
+      boom.type='sine';boom.frequency.setValueAtTime(80,now);
+      boom.frequency.exponentialRampToValueAtTime(30,now+0.8);
+      bg.gain.setValueAtTime(0,now);bg.gain.linearRampToValueAtTime(0.5,now+0.05);
+      bg.gain.exponentialRampToValueAtTime(0.001,now+0.9);
+      boom.start(now);boom.stop(now+1);
+      // High shimmer sweep
+      const sh=ctx.createOscillator(),sg=ctx.createGain();
+      sh.connect(sg);sg.connect(ctx.destination);
+      sh.type='sine';sh.frequency.setValueAtTime(600,now+0.1);
+      sh.frequency.linearRampToValueAtTime(2400,now+0.7);
+      sg.gain.setValueAtTime(0,now+0.1);sg.gain.linearRampToValueAtTime(0.12,now+0.2);
+      sg.gain.exponentialRampToValueAtTime(0.001,now+0.8);
+      sh.start(now+0.1);sh.stop(now+0.9);
+
+    } else if (type === 'tryagain') {
+      // Glitchy reboot blip — three quick rising pulses
+      [200,350,500].forEach((freq,i) => {
+        const o=ctx.createOscillator(),g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);
+        o.type='square';o.frequency.value=freq;
+        const t=now+i*0.08;
+        g.gain.setValueAtTime(0.18,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.07);
+        o.start(t);o.stop(t+0.08);
+      });
+      // Static noise burst
+      const bufSize=ctx.sampleRate*0.15;
+      const buf=ctx.createBuffer(1,bufSize,ctx.sampleRate);
+      const data=buf.getChannelData(0);
+      for(let i=0;i<bufSize;i++) data[i]=(Math.random()*2-1)*0.08;
+      const src=ctx.createBufferSource(),ng=ctx.createGain();
+      src.buffer=buf;src.connect(ng);ng.connect(ctx.destination);
+      ng.gain.setValueAtTime(0.2,now+0.24);ng.gain.exponentialRampToValueAtTime(0.001,now+0.38);
+      src.start(now+0.24);
+
+    } else if (type === 'meteor') {
+      // Long falling whoosh (high→low) then impact thud
+      // Whoosh
+      const w=ctx.createOscillator(),wg=ctx.createGain();
+      const wf=ctx.createBiquadFilter();wf.type='bandpass';wf.frequency.value=800;wf.Q.value=0.5;
+      w.connect(wf);wf.connect(wg);wg.connect(ctx.destination);
+      w.type='sawtooth';
+      w.frequency.setValueAtTime(3000,now);w.frequency.exponentialRampToValueAtTime(120,now+2.2);
+      wg.gain.setValueAtTime(0,now);wg.gain.linearRampToValueAtTime(0.22,now+0.3);
+      wg.gain.linearRampToValueAtTime(0.28,now+1.8);wg.gain.exponentialRampToValueAtTime(0.001,now+2.4);
+      w.start(now);w.stop(now+2.5);
+      // White noise layer for texture
+      const nbuf=ctx.createBuffer(1,ctx.sampleRate*2.5,ctx.sampleRate);
+      const nd=nbuf.getChannelData(0);for(let i=0;i<nd.length;i++) nd[i]=(Math.random()*2-1);
+      const ns=ctx.createBufferSource(),nf=ctx.createBiquadFilter(),ng2=ctx.createGain();
+      ns.buffer=nbuf;nf.type='highpass';nf.frequency.value=800;
+      ns.connect(nf);nf.connect(ng2);ng2.connect(ctx.destination);
+      ng2.gain.setValueAtTime(0,now);ng2.gain.linearRampToValueAtTime(0.08,now+0.2);
+      ng2.gain.linearRampToValueAtTime(0.12,now+1.8);ng2.gain.exponentialRampToValueAtTime(0.001,now+2.4);
+      ns.start(now);
+      // Impact thud
+      const imp=ctx.createOscillator(),ig=ctx.createGain();
+      imp.connect(ig);ig.connect(ctx.destination);
+      imp.type='sine';imp.frequency.setValueAtTime(120,now+2.2);
+      imp.frequency.exponentialRampToValueAtTime(25,now+2.7);
+      ig.gain.setValueAtTime(0,now+2.2);ig.gain.linearRampToValueAtTime(0.6,now+2.22);
+      ig.gain.exponentialRampToValueAtTime(0.001,now+2.8);
+      imp.start(now+2.2);imp.stop(now+2.9);
+    }
+  } catch(e) {}
+}
+
+// ===== GBA HORROR BGM — inspired by sparse, mournful, slow drone style =====
+// A minor / D minor tonality, ~44 BPM, plucked pulse leads, triangle bass,
+// detuned pad drones, filtered ghost noise — very low volume
+let bgMusicNodes = [];
+let bgMusicRunning = false;
+let bgMusicGain = null;
+
+function startBgMusic() {
+  if (bgMusicRunning) return;
+  bgMusicRunning = true;
+  try {
+    const ctx = getAudioCtx();
+    bgMusicGain = ctx.createGain();
+    bgMusicGain.gain.value = 0.045; // very quiet — doesn't fight SFX
+    bgMusicGain.connect(ctx.destination);
+    scheduleBgLoop(ctx, ctx.currentTime + 0.3);
+  } catch(e) {}
+}
+
+function stopBgMusic() {
+  bgMusicRunning = false;
+  try {
+    bgMusicNodes.forEach(n => { try { n.stop(); } catch(e){} });
+    bgMusicNodes = [];
+    if (bgMusicGain) { bgMusicGain.disconnect(); bgMusicGain = null; }
+  } catch(e) {}
+}
+
+function scheduleBgLoop(ctx, startTime) {
+  if (!bgMusicRunning) return;
+
+  // ── TIME GRID ──────────────────────────────────────────────────
+  // 44 BPM → each beat = 1.364s. Very slow and heavy like the reference.
+  const bpm   = 44;
+  const b     = 60 / bpm;          // 1 beat  ≈ 1.364 s
+  const h     = b / 2;             // 1 half-beat
+  const loop  = b * 32;            // 32 beats total (~43.6 s)
+
+  // ── HELPER: schedule one GBA-style pulse note ──────────────────
+  // type: 'square'|'triangle'|'sine'  vol: 0-1  attack/release in seconds
+  function note(freq, dur, t, type, vol, atk, rel) {
+    if (!bgMusicRunning || freq <= 0) return;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type   = type || 'square';
+    o.frequency.value = freq;
+    o.connect(g); g.connect(bgMusicGain);
+    const a  = atk  || 0.015;
+    const r  = rel  || Math.min(dur * 0.35, 0.18);
+    g.gain.setValueAtTime(0,   t);
+    g.gain.linearRampToValueAtTime(vol || 0.5, t + a);
+    g.gain.setValueAtTime(vol || 0.5,          t + dur - r);
+    g.gain.linearRampToValueAtTime(0,           t + dur);
+    o.start(t); o.stop(t + dur + 0.01);
+    bgMusicNodes.push(o);
+  }
+
+  // ── CHANNEL 1: LEAD MELODY ─────────────────────────────────────
+  // GBA Pulse 1 — square wave, main mournful theme
+  // A natural minor: A B C D E F G A
+  // Frequencies (Hz): A3=220 B3=246.94 C4=261.63 D4=293.66 E4=329.63 F4=349.23 G4=392 A4=440
+  // Motif: slow descending with long rests, haunting and sparse like the reference
+  const s = startTime;
+  const mel = [
+    // ── Phrase 1 (bars 1-4): ghostly descend from A4 to D3
+    [440.00, b*1.2,  s + b*0,    'square', 0.48, 0.02, 0.3 ],  // A4
+    [392.00, b*0.8,  s + b*1.5,  'square', 0.44, 0.02, 0.2 ],  // G4
+    [349.23, b*1.5,  s + b*2.5,  'square', 0.5,  0.02, 0.35],  // F4
+    [329.63, b*2.5,  s + b*4.5,  'square', 0.42, 0.03, 0.5 ],  // E4  long hold
+    // ── rest b*7 ── silence ──
+    [293.66, b*1.0,  s + b*8,    'square', 0.46, 0.02, 0.2 ],  // D4
+    [261.63, b*0.7,  s + b*9.2,  'square', 0.38, 0.015,0.15],  // C4
+    [246.94, b*1.8,  s + b*10.1, 'square', 0.44, 0.02, 0.4 ],  // B3
+    [220.00, b*3.5,  s + b*12.2, 'square', 0.50, 0.03, 0.7 ],  // A3  long hold
+    // ── rest b*15.7–b*17 ── deep silence ──
+    // ── Phrase 2 (bars 17-24): rising plea then fall
+    [174.61, b*0.8,  s + b*17,   'square', 0.36, 0.02, 0.15],  // F3
+    [196.00, b*0.8,  s + b*18,   'square', 0.40, 0.02, 0.18],  // G3
+    [220.00, b*1.2,  s + b*19,   'square', 0.46, 0.02, 0.25],  // A3
+    [261.63, b*1.0,  s + b*20.5, 'square', 0.42, 0.02, 0.22],  // C4
+    [246.94, b*2.0,  s + b*22,   'square', 0.48, 0.03, 0.5 ],  // B3  drop
+    // ── rest b*24–b*25 ──
+    // ── Phrase 3 (bars 25-32): final descent, echo of phrase 1 quieter
+    [220.00, b*0.9,  s + b*25,   'square', 0.38, 0.015,0.2 ],  // A3
+    [196.00, b*0.7,  s + b*26.1, 'square', 0.34, 0.015,0.15],  // G3
+    [174.61, b*1.0,  s + b*27,   'square', 0.36, 0.02, 0.22],  // F3
+    [164.81, b*1.5,  s + b*28.2, 'square', 0.40, 0.02, 0.35],  // E3
+    [146.83, b*3.5,  s + b*29.5, 'square', 0.44, 0.03, 0.8 ],  // D3  final hold
+  ];
+  mel.forEach(([f,d,t,tp,v,a,r]) => note(f,d,t,tp,v,a,r));
+
+  // ── CHANNEL 2: HARMONY / INNER VOICE ──────────────────────────
+  // GBA Pulse 2 — detuned square (+4 cents) for slight chorus thickness
+  // Sparse countermelody, mostly 3rds below the lead
+  const harm = [
+    [329.63, b*1.0,  s + b*0.3,  'square', 0.28, 0.025, 0.25],  // E4 (third below A4)
+    [261.63, b*0.7,  s + b*2.7,  'square', 0.24, 0.02,  0.18],  // C4
+    [246.94, b*2.0,  s + b*4.8,  'square', 0.26, 0.025, 0.45],  // B3 (third below E4)
+    [196.00, b*1.5,  s + b*8.3,  'square', 0.28, 0.02,  0.3 ],  // G3
+    [164.81, b*3.0,  s + b*12.5, 'square', 0.30, 0.03,  0.6 ],  // E3
+    [146.83, b*1.0,  s + b*17.2, 'square', 0.22, 0.02,  0.2 ],  // D3
+    [164.81, b*0.8,  s + b*18.3, 'square', 0.24, 0.02,  0.18],  // E3
+    [196.00, b*1.5,  s + b*19.3, 'square', 0.26, 0.025, 0.32],  // G3
+    [174.61, b*2.5,  s + b*21.2, 'square', 0.28, 0.025, 0.5 ],  // F3
+    [146.83, b*0.8,  s + b*25.2, 'square', 0.22, 0.015, 0.18],  // D3
+    [130.81, b*1.0,  s + b*26.3, 'square', 0.24, 0.02,  0.22],  // C3
+    [123.47, b*1.2,  s + b*27.3, 'square', 0.26, 0.02,  0.25],  // B2
+    [110.00, b*3.0,  s + b*29.8, 'square', 0.30, 0.03,  0.65],  // A2
+  ];
+  // Apply tiny detune for the GBA pulse-2 feel
+  harm.forEach(([f,d,t,tp,v,a,r]) => {
+    note(f * 1.0029, d, t, tp, v, a, r); // +5 cents detune
+  });
+
+  // ── CHANNEL 3: TRIANGLE BASS ──────────────────────────────────
+  // GBA Wave channel — triangle wave, slow thumps on roots
+  // Very prominent in GBA music, gives warmth and weight
+  const bass = [
+    [55.00, b*3.5,  s + b*0,    'triangle', 0.75, 0.04, 0.8 ],  // A1
+    [43.65, b*3.5,  s + b*4,    'triangle', 0.68, 0.04, 0.8 ],  // F1
+    [49.00, b*3.5,  s + b*8,    'triangle', 0.72, 0.04, 0.8 ],  // G1
+    [41.20, b*3.5,  s + b*12,   'triangle', 0.70, 0.04, 0.8 ],  // E1
+    [36.71, b*4.0,  s + b*16,   'triangle', 0.65, 0.05, 0.9 ],  // D1  long
+    [55.00, b*3.5,  s + b*20,   'triangle', 0.72, 0.04, 0.8 ],  // A1
+    [43.65, b*2.5,  s + b*24,   'triangle', 0.65, 0.04, 0.6 ],  // F1
+    [49.00, b*2.0,  s + b*27,   'triangle', 0.68, 0.04, 0.5 ],  // G1
+    [36.71, b*3.0,  s + b*29,   'triangle', 0.70, 0.05, 0.7 ],  // D1  resolve
+  ];
+  bass.forEach(([f,d,t,tp,v,a,r]) => note(f,d,t,tp,v,a,r));
+
+  // ── CHANNEL 4: DRONE PADS ─────────────────────────────────────
+  // Sine waves, slow swell, two voices detuned for that ghostly shimmer
+  // Inspired by the droning strings in the reference track
+  const drones = [
+    // Tonic drone — A minor
+    [110.00, b*16, s,          0.10, 2.5],  // A2  swell through first half
+    [164.81, b*12, s + b*2,    0.07, 3.0],  // E3
+    [130.81, b*10, s + b*5,    0.06, 2.5],  // C3
+    // Second half shift to D minor feel
+    [73.42,  b*16, s + b*16,   0.10, 2.5],  // D2
+    [110.00, b*12, s + b*18,   0.07, 3.0],  // A2
+    [87.31,  b*10, s + b*21,   0.06, 2.5],  // F2
+  ];
+  drones.forEach(([f, dur, t, maxVol, swellT]) => {
+    if (!bgMusicRunning) return;
+    [-0.6, 0.6].forEach(dt => {  // two detuned sines for chorus
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = f + dt;
+      o.connect(g); g.connect(bgMusicGain);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(maxVol, t + swellT);
+      g.gain.setValueAtTime(maxVol, t + dur - swellT);
+      g.gain.linearRampToValueAtTime(0, t + dur);
+      o.start(t); o.stop(t + dur + 0.01);
+      bgMusicNodes.push(o);
+    });
+  });
+
+  // ── CHANNEL 4B: SOFT TREMOLO ACCENT ───────────────────────────
+  // Mimics the plucked string tremolo feel in the reference
+  // Rapid amplitude oscillation on a held note — very GBA-authentic
+  const tremoloNotes = [
+    [220.00, b*4,  s + b*4.5 ],   // A3 tremolo
+    [196.00, b*3,  s + b*21  ],   // G3 tremolo
+  ];
+  tremoloNotes.forEach(([f, dur, t]) => {
+    if (!bgMusicRunning) return;
+    const o = ctx.createOscillator();
+    const trem = ctx.createOscillator();  // LFO
+    const tremGain = ctx.createGain();
+    const g = ctx.createGain();
+    o.type = 'square'; o.frequency.value = f;
+    trem.type = 'sine'; trem.frequency.value = 8;  // 8 Hz tremolo
+    trem.connect(tremGain); tremGain.gain.value = 0.12;
+    o.connect(g); tremGain.connect(g.gain);
+    g.connect(bgMusicGain);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.22, t + 0.05);
+    g.gain.setValueAtTime(0.22, t + dur - 0.3);
+    g.gain.linearRampToValueAtTime(0, t + dur);
+    o.start(t); o.stop(t + dur + 0.01);
+    trem.start(t); trem.stop(t + dur + 0.01);
+    bgMusicNodes.push(o, trem);
+  });
+
+  // ── GHOST NOISE BREATH ─────────────────────────────────────────
+  // Very low filtered noise, barely audible — like room reverb / breath
+  try {
+    const bufSamples = Math.floor(ctx.sampleRate * loop);
+    const nBuf = ctx.createBuffer(1, bufSamples, ctx.sampleRate);
+    const nData = nBuf.getChannelData(0);
+    for (let i = 0; i < bufSamples; i++) nData[i] = (Math.random() * 2 - 1);
+    const ns  = ctx.createBufferSource();
+    ns.buffer = nBuf;
+    const lpf = ctx.createBiquadFilter(); lpf.type = 'lowpass';  lpf.frequency.value = 280;
+    const hpf = ctx.createBiquadFilter(); hpf.type = 'highpass'; hpf.frequency.value = 60;
+    const ng  = ctx.createGain();
+    ns.connect(lpf); lpf.connect(hpf); hpf.connect(ng); ng.connect(bgMusicGain);
+    // Slow breath swell — gets slightly louder in the middle of the loop
+    ng.gain.setValueAtTime(0,      startTime);
+    ng.gain.linearRampToValueAtTime(0.06,  startTime + 5);
+    ng.gain.linearRampToValueAtTime(0.10,  startTime + loop * 0.4);
+    ng.gain.linearRampToValueAtTime(0.06,  startTime + loop * 0.7);
+    ng.gain.linearRampToValueAtTime(0,     startTime + loop);
+    ns.start(startTime); ns.stop(startTime + loop);
+    bgMusicNodes.push(ns);
+  } catch(e) {}
+
+  // ── LOOP SCHEDULING ────────────────────────────────────────────
+  // Reschedule ~300 ms before loop end for seamless repeat
+  const overlap = 0.3;
+  const reschedAt = (startTime + loop - overlap - ctx.currentTime) * 1000;
+  setTimeout(() => {
+    if (!bgMusicRunning) return;
+    // Prune stopped nodes to avoid memory buildup
+    bgMusicNodes = [];
+    scheduleBgLoop(ctx, startTime + loop - overlap);
+  }, Math.max(0, reschedAt - 150));
+}
+
+
+// ===== START LAB =====
+function startLab() {
+  currentLevel = 1; wrongs = 0; corrects = 0; totalCorrects = 0;
+  resetLabUI();
+  levelQuestions = pickRandom(level1Bank, QS_PER_LEVEL);
+  currentQ = 0;
+  applyLevelTheme();
+  showScreen('lab-screen');
+  const vid = document.getElementById('alienVideo');
+  if (vid) { vid.currentTime = 0; vid.play().catch(() => {}); }
+  loadQuestion();
+}
+
+function applyLevelTheme() {
+  const badge = document.getElementById('levelBadge');
+  const title = document.getElementById('labTitleText');
+  document.getElementById('levelNum').textContent = currentLevel;
+  if (currentLevel === 1) {
+    badge.className = 'level-badge l1'; badge.textContent = 'LEVEL 1 — VOCABULARY';
+    title.textContent = '⚗ XENOLINGUISTICS LAB — SECTOR 7'; title.style.color = '#ff0040';
+  } else if (currentLevel === 2) {
+    badge.className = 'level-badge l2'; badge.textContent = 'LEVEL 2 — FILL THE BLANK';
+    title.textContent = '⚗ SYNTACTIC TESTING CHAMBER — SECTOR 12'; title.style.color = '#00cfff';
+  } else {
+    badge.className = 'level-badge l3'; badge.textContent = 'LEVEL 3 — ADVANCED VOCABULARY';
+    title.textContent = '⚗ FINAL ANALYSIS UNIT — SECTOR Ω'; title.style.color = '#ffdd00';
+  }
+}
+
+function resetLabUI() {
+  for (let i = 0; i < 4; i++) document.getElementById(`pip${i}`).classList.remove('dead');
+  document.getElementById('correctCount').textContent = '0';
+  document.getElementById('wrongCount').textContent = '0';
+  document.getElementById('wrongLog').innerHTML = '';
+  document.getElementById('progressBar').style.width = '0%';
+  document.getElementById('dissectWarning').style.display = 'none';
+  document.getElementById('statusText').textContent = 'STABLE';
+  document.getElementById('statusText').style.color = 'var(--green)';
+  document.getElementById('threatLevel').textContent = 'LOW';
+  document.getElementById('threatLevel').style.color = 'var(--yellow)';
+}
+
+// ===== TIMER =====
+function startTimer() {
+  clearInterval(timerInterval);
+  timeLeft = TIMER_SECS; renderTimer();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    renderTimer();
+    if (timeLeft <= 3 && timeLeft > 0) playSound('danger');
+    else if (timeLeft > 3) playSound('tick');
+    if (timeLeft <= 0) { clearInterval(timerInterval); timerInterval = null; onTimerExpired(); }
+  }, 1000);
+}
+function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
+function renderTimer() {
+  const d = document.getElementById('timerDigit');
+  const b = document.getElementById('timerBar');
+  if (!d || !b) return;
+  d.textContent = String(timeLeft).padStart(2, '0');
+  b.style.width = `${(timeLeft / TIMER_SECS) * 100}%`;
+  const danger = timeLeft <= 3;
+  d.classList.toggle('danger', danger);
+  b.classList.toggle('danger', danger);
+}
+
+function onTimerExpired() {
+  if (answered) return;
+  answered = true;
+  playSound('timeout');
+  const q = levelQuestions[currentQ];
+  const btns = currentLevel === 2 ? document.querySelectorAll('.fitb-btn') : document.querySelectorAll('.option-btn');
+  if (btns[q.correct]) btns[q.correct].classList.add('correct');
+  wrongs++;
+  document.getElementById('wrongCount').textContent = wrongs;
+  updateLives(); updateThreat();
+  addWrongLog(`Q${currentQ+1}: TIME EXPIRED`);
+  flashStatic();
+  document.getElementById('alienSpeech').textContent = 'TIME EXPIRED. SILENCE = FAILURE.';
+  document.getElementById('statusText').textContent = wrongs >= 3 ? 'CRITICAL' : 'UNSTABLE';
+  document.getElementById('statusText').style.color = 'var(--red)';
+  document.getElementById('dissectWarning').style.display = wrongs >= 3 ? 'block' : 'none';
+  if (wrongs >= MAX_WRONGS) { setTimeout(() => endGame(false), 1200); return; }
+  disableAll();
+  setTimeout(() => { currentQ++; loadQuestion(); }, 1400);
+}
+
+// ===== LOAD QUESTION =====
+function loadQuestion() {
+  if (currentQ >= QS_PER_LEVEL) { levelComplete(); return; }
+  answered = false;
+  const q = levelQuestions[currentQ];
+
+  document.getElementById('qProgress').textContent = `Q ${currentQ+1} / ${QS_PER_LEVEL}`;
+  document.getElementById('qCounter').textContent = `QUESTION ${String(currentQ+1).padStart(3,'0')} OF ${String(QS_PER_LEVEL).padStart(3,'0')}`;
+
+  const qEl = document.getElementById('qText');
+  qEl.textContent = q.q;
+  qEl.className = `q-text q-animate${currentLevel===2?' l2':''}`;
+  document.getElementById('alienSpeech').textContent = q.alien;
+  document.getElementById('progressBar').style.width = `${(currentQ/QS_PER_LEVEL)*100}%`;
+
+  const container = document.getElementById('answersContainer');
+  container.innerHTML = '';
+
+  if (currentLevel === 2) {
+    const div = document.createElement('div');
+    div.className = 'fitb-options';
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'fitb-btn';
+      btn.textContent = opt;
+      btn.addEventListener('click', () => handleAnswer(i, btn));
+      div.appendChild(btn);
+    });
+    container.appendChild(div);
+  } else {
+    const grid = document.createElement('div');
+    grid.className = 'options-grid';
+    const keys = ['A','B','C','D'];
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = `${keys[i]}: ${opt}`;
+      btn.dataset.key = keys[i];
+      btn.addEventListener('click', () => handleAnswer(i, btn));
+      grid.appendChild(btn);
+    });
+    container.appendChild(grid);
+  }
+
+  startTimer();
+}
+
+// ===== HANDLE ANSWER =====
+function handleAnswer(idx, btn) {
+  if (answered) return;
+  answered = true;
+  stopTimer();
+  const q = levelQuestions[currentQ];
+  const allBtns = currentLevel === 2 ? document.querySelectorAll('.fitb-btn') : document.querySelectorAll('.option-btn');
+
+  if (idx === q.correct) {
+    btn.classList.add('correct');
+    corrects++; totalCorrects++;
+    document.getElementById('correctCount').textContent = corrects;
+    document.getElementById('alienSpeech').textContent = 'CORRECT. HUMAN LANGUAGE UNIT FUNCTIONAL.';
+    document.getElementById('statusText').textContent = 'STABLE';
+    document.getElementById('statusText').style.color = 'var(--green)';
+    playSound('correct');
+  } else {
+    btn.classList.add('wrong');
+    if (allBtns[q.correct]) allBtns[q.correct].classList.add('correct');
+    wrongs++;
+    document.getElementById('wrongCount').textContent = wrongs;
+    updateLives(); updateThreat();
+    addWrongLog(`Q${currentQ+1}: ERROR LOGGED`);
+    flashStatic();
+    playSound('wrong');
+    document.getElementById('alienSpeech').textContent = 'INCORRECT. MARKING FOR DISSECTION CONSIDERATION...';
+    document.getElementById('statusText').textContent = wrongs >= 3 ? 'CRITICAL' : 'UNSTABLE';
+    document.getElementById('statusText').style.color = 'var(--red)';
+    document.getElementById('dissectWarning').style.display = wrongs >= 3 ? 'block' : 'none';
+    if (wrongs >= MAX_WRONGS) { setTimeout(() => endGame(false), 1000); return; }
+  }
+
+  disableAll();
+  setTimeout(() => { currentQ++; loadQuestion(); }, 1400);
+}
+
+function disableAll() { document.querySelectorAll('.option-btn,.fitb-btn').forEach(b => b.style.pointerEvents = 'none'); }
+function updateLives() { for (let i=0;i<4;i++) document.getElementById(`pip${i}`).classList.toggle('dead', i>=(4-wrongs)); }
+function updateThreat() {
+  const t = wrongs===0?'LOW':wrongs===1?'MEDIUM':wrongs===2?'HIGH':'CRITICAL';
+  const c = {LOW:'#ffdd00',MEDIUM:'#ff8800',HIGH:'#ff4400',CRITICAL:'#ff0040'};
+  const el = document.getElementById('threatLevel');
+  el.textContent = t; el.style.color = c[t];
+}
+function addWrongLog(msg) {
+  const e = document.createElement('div');
+  e.className = 'wrong-entry'; e.textContent = msg;
+  document.getElementById('wrongLog').appendChild(e);
+}
+function flashStatic() {
+  const so = document.getElementById('staticOverlay');
+  so.style.transition = 'opacity 0.05s'; so.style.opacity = '1';
+  setTimeout(() => { so.style.opacity = '0'; }, 300);
+}
+
+// ===== LEVEL COMPLETE =====
+function levelComplete() {
+  stopTimer();
+  playSound('levelpass');
+
+  // Show pass video, then after it ends (or 5s fallback) show transition or win
+  showScreen('pass-video-screen');
+  const pv = document.getElementById('passVideo');
+  pv.currentTime = 0;
+  pv.play().catch(() => {});
+
+  const afterPass = () => {
+    pv.onended = null;
+    if (currentLevel < 3) {
+      const subs = {
+        1:`YOU SURVIVED THE VOCABULARY SCAN.<br>THE ALIENS COMMUNICATE AMONG THEMSELVES...<br><br><span style="color:var(--blue);font-size:6px;">NEXT: FILL IN THE BLANK — SYNTACTIC CHAMBER SECTOR 12</span>`,
+        2:`YOU COMPLETED THE SYNTACTIC INSERTION TEST.<br>THE ALIEN SCIENTISTS TAKE FRANTIC NOTES...<br><br><span style="color:var(--yellow);font-size:6px;">FINAL LEVEL: ADVANCED VOCABULARY — SECTOR Ω</span>`
+      };
+      const btnText = {1:'PROCEED TO LEVEL 2 →',2:'PROCEED TO LEVEL 3 →'};
+      document.getElementById('transTitle').textContent = `✓ LEVEL ${currentLevel} COMPLETE`;
+      document.getElementById('transSub').innerHTML = subs[currentLevel];
+      document.getElementById('transBtn').textContent = btnText[currentLevel];
+      showScreen('level-transition-screen');
+    } else {
+      endGame(true);
+    }
+  };
+
+  pv.onended = afterPass;
+  // Fallback: 5 seconds if video doesn't fire onended
+  setTimeout(() => {
+    if (document.getElementById('pass-video-screen').classList.contains('active')) {
+      afterPass();
+    }
+  }, 5000);
+}
+
+function startNextLevel() {
+  currentLevel++;
+  wrongs = 0; corrects = 0; currentQ = 0;
+  resetLabUI();
+  if (currentLevel === 2) levelQuestions = pickRandom(level2Bank, QS_PER_LEVEL);
+  else levelQuestions = pickRandom(level3Bank, QS_PER_LEVEL);
+  applyLevelTheme();
+  showScreen('lab-screen');
+  loadQuestion();
+}
+
+// ===== END GAME =====
+function endGame(won) {
+  stopTimer();
+  if (won) {
+    playSound('win');
+    document.getElementById('winScore').textContent = `TOTAL CORRECT: ${totalCorrects}/30 | ALL LEVELS CLEARED`;
+    showScreen('win-screen');
+  } else {
+    playSound('dissect');
+    showScreen('fail-screen');
+    const dv = document.getElementById('dissectionVideo');
+    if (dv) { dv.currentTime = 0; dv.play().catch(() => {}); }
+  }
+}
+
+// ===== RESTART =====
+function restart() {
+  stopTimer();
+  playSound('tryagain');
+  const dv = document.getElementById('dissectionVideo');
+  if (dv) { dv.pause(); dv.currentTime = 0; }
+  const pv = document.getElementById('passVideo');
+  if (pv) { pv.pause(); pv.currentTime = 0; pv.onended = null; }
+  document.getElementById('flashOverlay').style.opacity = '0';
+  const s2 = document.getElementById('startVideo2');
+  s2.pause(); s2.currentTime = 0; s2.onended = null;
+  const s1 = document.getElementById('startVideo1');
+  s1.currentTime = 0; s1.play().catch(() => {});
+  showScreen('video-start-screen');
+}
+</script>
+</body>
+</html>
