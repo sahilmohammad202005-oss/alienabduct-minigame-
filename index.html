@@ -53,18 +53,7 @@
   #video-start-screen, #video-start2-screen { background:#000; }
   .full-video { width:100%; height:100%; object-fit:cover; display:block; }
 
-  .video-start-btn {
-    position:absolute; bottom:50%; left:50%;
-    transform: translate(-50%, 50%);
-    font-family:'Press Start 2P',monospace; font-size:11px;
-    padding:18px 40px; background:transparent;
-    border:2px solid var(--green); color:var(--green);
-    cursor:pointer; letter-spacing:3px;
-    text-shadow:0 0 10px var(--green);
-    box-shadow:0 0 20px var(--green), inset 0 0 20px rgba(0,255,65,0.05);
-    animation:blink 1.5s step-start infinite; z-index:10;
-  }
-  .video-start-btn:hover { background:var(--green); color:#000; animation:none; box-shadow:0 0 40px var(--green); cursor:pointer; }
+  /* .video-start-btn replaced by spiderverse button */
 
   .video-skip-hint {
     position:absolute; bottom:24px; right:30px;
@@ -75,27 +64,65 @@
   @keyframes blink { 50%{opacity:0} }
 
   .flash-overlay {
-    position:fixed; inset:0; background:white; opacity:0;
-    z-index:500; pointer-events:none;
+    position:fixed; inset:0;
+    background: radial-gradient(ellipse at center, #e8ffe8 0%, #ccffcc 30%, #ffffff 70%);
+    opacity:0; z-index:500; pointer-events:none;
   }
 
   .flicker { animation:flicker 8s infinite; }
   @keyframes flicker { 0%,95%,100%{opacity:1} 96%{opacity:0.4} 97%{opacity:1} 98%{opacity:0.1} 99%{opacity:0.9} }
 
-  /* ========== WAKEUP ========== */
+  /* ========== WAKEUP — TERMINAL REDESIGN ========== */
   #wakeup-screen { background:#000; }
-  .wakeup-pixel-art { width:100%; height:100%; position:relative; overflow:hidden; }
-  .lab-bg { position:absolute; inset:0; background:linear-gradient(180deg,#010808,#000d0d); }
-  .lab-bg::before {
-    content:''; position:absolute; inset:0;
-    background-image:linear-gradient(rgba(0,255,65,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,65,0.05) 1px,transparent 1px);
-    background-size:32px 32px;
-  }
-  .wakeup-text-container { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; padding:40px; }
-  .blurry { filter:blur(8px); animation:unblur 3s ease forwards; animation-delay:0.5s; }
+  .blurry { filter:blur(10px); animation:unblur 2.8s ease forwards; animation-delay:0.3s; }
   @keyframes unblur { to{filter:blur(0)} }
-  .wakeup-msg { font-size:10px; line-height:2; text-align:center; color:var(--green); text-shadow:0 0 10px var(--green); max-width:600px; }
-  .wakeup-msg span { display:block; }
+
+  /* wakeup terminal container */
+  .wakeup-terminal {
+    position:relative; z-index:10;
+    display:flex; flex-direction:column; align-items:center;
+    gap:14px; padding:28px 32px; width:100%; max-width:680px;
+    max-height:100dvh; overflow-y:auto;
+  }
+  /* top status bar */
+  .wt-topbar {
+    display:flex; justify-content:space-between; align-items:center;
+    width:100%; border-bottom:1px solid #00ff4122; padding-bottom:8px;
+    font-size:6px; letter-spacing:3px; flex-wrap:wrap; gap:6px;
+  }
+  .wt-blink { animation:blink 1.2s step-start infinite; }
+  /* alien glyph */
+  .wt-alien-wrap {
+    padding:12px; border:1px solid #00ff4133;
+    background:rgba(0,255,65,0.03);
+    box-shadow:0 0 24px #00ff4122, inset 0 0 16px #00ff4108;
+  }
+  /* terminal text */
+  .wt-terminal {
+    width:100%; background:#000a00;
+    border:1px solid #00ff4133; padding:14px 18px;
+    display:flex; flex-direction:column; gap:6px;
+    box-shadow: inset 0 0 20px rgba(0,255,65,0.05);
+  }
+  .wt-line {
+    font-family:'VT323',monospace; font-size:18px;
+    color:#558855; line-height:1.4; text-shadow:0 0 4px #00ff4133;
+  }
+  .wt-gap { margin-top:6px; }
+  .wt-prompt { color:#00ff41; margin-right:4px; }
+  .wt-cursor-line {
+    font-family:'VT323',monospace; font-size:18px;
+    color:#00ff41; text-shadow:0 0 8px #00ff41;
+  }
+  .wt-cursor { animation:blink 0.7s step-start infinite; color:#00ff41; }
+  /* specimen tag */
+  .wt-tag {
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    justify-content:center; font-size:6px; color:#334433;
+    letter-spacing:2px; border-top:1px solid #00ff4111; padding-top:8px; width:100%;
+  }
+
+  /* keep vignette class so nothing breaks */
   .vignette { position:absolute; inset:0; background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,0.9) 100%); pointer-events:none; }
   .specimen-tag { font-size:6px; color:#ff0040; letter-spacing:4px; animation:blink 2s step-start infinite; }
 
@@ -265,12 +292,14 @@
     }
     .video-skip-hint { font-size:6px; bottom:16px; right:16px; }
 
-    /* ── Wakeup screen ── */
-    .wakeup-text-container { padding:20px 16px; gap:14px; justify-content:flex-start; padding-top:40px; overflow-y:auto; }
-    .wakeup-msg { font-size:7px; line-height:1.9; max-width:100%; }
-    .wakeup-msg span:first-child { font-size:9px!important; }
-    .specimen-tag { font-size:5px; letter-spacing:2px; text-align:center; }
-    .wakeup-text-container svg:first-child { width:56px!important; height:70px!important; }
+    /* ── Wakeup terminal ── */
+    .wakeup-terminal { padding:16px 14px; gap:10px; }
+    .wt-topbar { font-size:5px; gap:4px; }
+    .wt-alien-wrap { padding:8px; }
+    .wt-alien-wrap svg { width:80px!important; height:96px!important; }
+    .wt-terminal { padding:10px 12px; gap:4px; }
+    .wt-line, .wt-cursor-line { font-size:15px; }
+    .wt-tag { font-size:5px; gap:6px; }
 
     /* ── Lab header — compact ── */
     .lab-header { padding:6px 10px; flex-wrap:wrap; gap:6px; }
@@ -375,6 +404,91 @@
     .fail-title { font-size:11px; }
     .lvl-title, .win-title { font-size:9px; }
   }
+
+  /* ========== DANGER RED OVERLAY ========== */
+  #dangerOverlay {
+    position:fixed; inset:0; pointer-events:none; z-index:450;
+    opacity:0; transition: opacity 1s ease;
+  }
+  @keyframes screenFlicker1 { 0%,100%{opacity:1} 10%{opacity:0.6} 30%{opacity:0.4} 60%{opacity:0.7} 80%{opacity:0.5} }
+  @keyframes screenFlicker2 { 0%,100%{opacity:1} 5%{opacity:0.3} 25%{opacity:0.2} 50%{opacity:0.5} 85%{opacity:0.3} }
+  @keyframes screenFlicker3 { 0%,100%{opacity:1} 3%{opacity:0.1} 15%{opacity:0.2} 30%{opacity:0.1} 55%{opacity:0.2} 85%{opacity:0.3} }
+  @keyframes textDistort1 { 0%,100%{transform:skewX(0)} 25%{transform:skewX(-2deg) translateX(2px)} 75%{transform:skewX(1.5deg) translateX(-1px)} }
+  @keyframes textDistort2 { 0%,100%{transform:skewX(0)} 20%{transform:skewX(-4deg) scaleX(1.02) translateX(4px)} 50%{transform:skewX(3deg) scaleX(0.99) translateX(-3px)} }
+  @keyframes textDistort3 { 0%,100%{transform:skewX(0)} 10%{transform:skewX(-6deg) scaleX(1.04) translateX(6px)} 30%{transform:skewX(5deg) scaleX(0.97) translateX(-5px)} 60%{transform:skewX(-4deg) scaleX(1.03) translateX(4px)} }
+  .distort-1 { animation: textDistort1 1.2s ease-in-out infinite; }
+  .distort-2 { animation: textDistort2 0.8s ease-in-out infinite; }
+  .distort-3 { animation: textDistort3 0.5s ease-in-out infinite; }
+
+  /* ========== SPIDER-VERSE GLITCH BUTTON ========== */
+  /* ── SPIDER-VERSE BUTTON — alien green/black/red theme ── */
+  .button-wrapper { position:relative; display:inline-flex; align-items:center; justify-content:center; transform-style:preserve-3d; }
+  .spiderverse-button {
+    position:relative; padding:16px 36px; font-size:11px; font-weight:900;
+    border:2px solid #00ff41; border-radius:0px; cursor:pointer;
+    background:#000; color:#00ff41;
+    text-transform:uppercase; letter-spacing:3px;
+    transition:all 0.15s ease; font-family:'Press Start 2P',monospace;
+    text-shadow:0 0 10px #00ff41, 0 0 20px #00ff4188;
+    box-shadow:0 0 12px #00ff4144, inset 0 0 12px rgba(0,255,65,0.06);
+    overflow:hidden; min-height:52px; white-space:nowrap;
+  }
+  .spiderverse-button:active { transform:scale(0.97); }
+  .glitch-layers { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; }
+  .glitch-layer {
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    display:flex; align-items:center; justify-content:center;
+    background:#000; border-radius:0px; opacity:0;
+    font-family:'Press Start 2P',monospace; font-size:11px; font-weight:900;
+    letter-spacing:3px; pointer-events:none; text-transform:uppercase;
+    border:2px solid transparent;
+  }
+  .layer-1 { color:#ff0040; border-color:#ff004088; }
+  .layer-2 { color:#00ff41; border-color:#00ff4188; }
+  .button-wrapper:hover .layer-1,.button-wrapper:active .layer-1 { opacity:1; animation:glitchLayer1 0.4s steps(2) infinite; }
+  .button-wrapper:hover .layer-2,.button-wrapper:active .layer-2 { opacity:1; animation:glitchLayer2 0.4s steps(2) infinite; }
+  .button-wrapper:hover .spiderverse-button,.button-wrapper:active .spiderverse-button {
+    animation:buttonGlitch 0.3s steps(2) infinite;
+    box-shadow:0 0 20px #00ff41,0 0 40px #ff004066,0 0 60px #00ff4133;
+  }
+  .btn-noise {
+    position:absolute; top:-50%; left:-50%; width:200%; height:200%;
+    background:repeating-radial-gradient(circle at 50% 50%,transparent 0,rgba(0,0,0,.1) 1px,transparent 2px);
+    pointer-events:none; opacity:0; transition:opacity 0.3s; animation:btnNoise 0.2s steps(2) infinite;
+  }
+  .button-wrapper:hover .btn-noise,.button-wrapper:active .btn-noise { opacity:1; }
+  .glitch-slice { position:absolute; width:120%; height:5px; background:#fff; opacity:0; left:-10%; pointer-events:none; animation:slice 3s linear infinite; }
+  @keyframes buttonGlitch {
+    0%{transform:translate(0) scale(1.05)} 25%{transform:translate(-6px,3px) scale(1.08) skewX(-4deg)}
+    50%{transform:translate(6px,-3px) scale(1.05) skewX(4deg)} 75%{transform:translate(-8px,-3px) scale(1.03) skewX(-2deg)} 100%{transform:translate(0) scale(1.05)}
+  }
+  @keyframes glitchLayer1 {
+    0%{transform:translate(-12px,-6px) scale(1.1) skewX(-8deg);clip-path:polygon(0 20%,100% 20%,100% 50%,0 50%)}
+    25%{transform:translate(12px,6px) scale(1.15) skewX(8deg);clip-path:polygon(0 30%,100% 30%,100% 60%,0 60%)}
+    50%{transform:translate(-8px,3px) scale(.95) skewX(-4deg);clip-path:polygon(0 10%,100% 10%,100% 40%,0 40%)}
+    75%{transform:translate(8px,-3px) scale(1.2) skewX(4deg);clip-path:polygon(0 40%,100% 40%,100% 70%,0 70%)}
+    100%{transform:translate(-12px,-6px) scale(1.1) skewX(-8deg);clip-path:polygon(0 20%,100% 20%,100% 50%,0 50%)}
+  }
+  @keyframes glitchLayer2 {
+    0%{transform:translate(12px,6px) scale(1.1) skewX(8deg);clip-path:polygon(0 50%,100% 50%,100% 80%,0 80%)}
+    25%{transform:translate(-12px,-6px) scale(1.15) skewX(-8deg);clip-path:polygon(0 60%,100% 60%,100% 90%,0 90%)}
+    50%{transform:translate(8px,-3px) scale(.95) skewX(4deg);clip-path:polygon(0 40%,100% 40%,100% 70%,0 70%)}
+    75%{transform:translate(-8px,3px) scale(1.2) skewX(-4deg);clip-path:polygon(0 70%,100% 70%,100% 100%,0 100%)}
+    100%{transform:translate(12px,6px) scale(1.1) skewX(8deg);clip-path:polygon(0 50%,100% 50%,100% 80%,0 80%)}
+  }
+  @keyframes btnNoise {
+    0%{transform:translate(0,0)} 20%{transform:translate(10%,5%)} 40%{transform:translate(15%,-5%)}
+    60%{transform:translate(5%,-10%)} 80%{transform:translate(10%,10%)} 100%{transform:translate(0,0)}
+  }
+  @keyframes slice { 0%{top:-10%;opacity:0} 1%{opacity:.5} 3%{opacity:0} 50%{top:110%} 100%{top:110%} }
+  @media (max-width:600px) {
+    .spiderverse-button { font-size:9px; padding:13px 22px; letter-spacing:2px; min-height:48px; }
+    .glitch-layer { font-size:9px; letter-spacing:2px; }
+  }
+  @media (max-width:380px) {
+    .spiderverse-button { font-size:8px; padding:11px 16px; }
+    .glitch-layer { font-size:8px; }
+  }
 </style>
 </head>
 <body>
@@ -382,12 +496,23 @@
 <div class="noise"></div>
 <div class="flash-overlay" id="flashOverlay"></div>
 <div class="static-overlay" id="staticOverlay"></div>
+<div id="dangerOverlay"></div>
 
 <!-- ========== VIDEO START 1 ========== -->
 <div class="screen active" id="video-start-screen">
   <video id="startVideo1" class="full-video" src="start1.MP4" autoplay muted loop playsinline></video>
   <div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);z-index:1;pointer-events:none;"></div>
-  <button class="video-start-btn" onclick="onStartGame()">▶ START GAME</button>
+  <div class="button-wrapper" style="position:absolute;bottom:50%;left:50%;transform:translate(-50%,50%);z-index:10;">
+    <button class="spiderverse-button" onclick="onStartGame()">
+      ▶ START GAME
+      <div class="glitch-layers">
+        <div class="glitch-layer layer-1">▶ START GAME</div>
+        <div class="glitch-layer layer-2">▶ START GAME</div>
+      </div>
+      <div class="btn-noise"></div>
+      <div class="glitch-slice"></div>
+    </button>
+  </div>
   <div class="video-skip-hint">[ TAP TO BEGIN ]</div>
 </div>
 
@@ -399,36 +524,81 @@
 
 <!-- ========== WAKEUP SCREEN ========== -->
 <div class="screen" id="wakeup-screen">
-  <div class="wakeup-pixel-art">
-    <div class="lab-bg"></div>
-    <svg style="position:absolute;left:5%;top:10%;" width="60" height="80" viewBox="0 0 8 10" xmlns="http://www.w3.org/2000/svg">
-      <rect x="1" y="0" width="6" height="8" fill="#001a00" stroke="#003300" stroke-width="0.5"/><rect x="2" y="1" width="4" height="6" fill="#00ff4122"/><rect x="3" y="3" width="2" height="1" fill="#00ff41"/><rect x="0" y="8" width="8" height="2" fill="#002200"/>
-    </svg>
-    <svg style="position:absolute;right:5%;top:15%;" width="48" height="64" viewBox="0 0 6 8" xmlns="http://www.w3.org/2000/svg">
-      <rect x="2" y="0" width="2" height="4" fill="#004400" stroke="#006600" stroke-width="0.3"/><ellipse cx="3" cy="4.5" rx="2" ry="1.5" fill="#003300" stroke="#00ff41" stroke-width="0.3"/><rect x="2.5" y="5.5" width="1" height="2.5" fill="#003300"/><rect x="1" y="7.5" width="4" height="0.5" fill="#002200"/>
-    </svg>
-    <div class="vignette"></div>
-    <div class="wakeup-text-container blurry" id="wakeupContent">
-      <svg width="80" height="100" viewBox="0 0 10 12" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 16px #00ff41);">
-        <ellipse cx="5" cy="3" rx="4" ry="3" fill="#003300"/><rect x="2" y="4" width="6" height="5" fill="#002200"/><rect x="1" y="5" width="8" height="3" fill="#003300"/>
-        <rect x="2" y="2" width="2" height="2" fill="#00ff41"/><rect x="6" y="2" width="2" height="2" fill="#00ff41"/>
-        <rect x="2.5" y="2.5" width="1" height="1" fill="#000"/><rect x="6.5" y="2.5" width="1" height="1" fill="#000"/>
-        <rect x="3" y="5" width="4" height="1" fill="#000a00"/>
-        <rect x="0" y="5" width="1" height="3" fill="#002200"/><rect x="9" y="5" width="1" height="3" fill="#002200"/>
-        <rect x="3" y="9" width="2" height="3" fill="#002200"/><rect x="5" y="9" width="2" height="3" fill="#002200"/>
+  <!-- scanline + grid bg -->
+  <div style="position:absolute;inset:0;background:#000;z-index:0;"></div>
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,255,65,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,65,0.04) 1px,transparent 1px);background-size:40px 40px;z-index:1;pointer-events:none;"></div>
+  <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.18) 3px,rgba(0,0,0,0.18) 4px);z-index:2;pointer-events:none;"></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,0.85) 100%);z-index:3;pointer-events:none;"></div>
+
+  <div class="wakeup-terminal blurry" id="wakeupContent">
+    <!-- TOP STATUS BAR -->
+    <div class="wt-topbar">
+      <span class="wt-blink" style="color:#ff0040;">⚠ NEURAL LINK ESTABLISHED</span>
+      <span style="color:#003300;">SYS::BOOT_OK</span>
+      <span class="wt-blink" style="color:#ffdd00;animation-delay:0.4s;">H-47</span>
+    </div>
+
+    <!-- ALIEN GLYPH — clean pixel art, bigger -->
+    <div class="wt-alien-wrap">
+      <svg width="120" height="140" viewBox="0 0 15 17" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 18px #00ff41) drop-shadow(0 0 6px #00ff41);">
+        <!-- head -->
+        <ellipse cx="7.5" cy="4" rx="5.5" ry="4" fill="#001800"/>
+        <ellipse cx="7.5" cy="4" rx="5.5" ry="4" fill="none" stroke="#00ff41" stroke-width="0.4"/>
+        <!-- eyes -->
+        <ellipse cx="5"   cy="3.5" rx="1.6" ry="1.2" fill="#00ff41" opacity="0.9"/>
+        <ellipse cx="10"  cy="3.5" rx="1.6" ry="1.2" fill="#00ff41" opacity="0.9"/>
+        <ellipse cx="5"   cy="3.5" rx="0.7" ry="0.8" fill="#000"/>
+        <ellipse cx="10"  cy="3.5" rx="0.7" ry="0.8" fill="#000"/>
+        <!-- eye glow rings -->
+        <ellipse cx="5"   cy="3.5" rx="2"   ry="1.5" fill="none" stroke="#00ff4155" stroke-width="0.3"/>
+        <ellipse cx="10"  cy="3.5" rx="2"   ry="1.5" fill="none" stroke="#00ff4155" stroke-width="0.3"/>
+        <!-- mouth line -->
+        <line x1="6" y1="5.8" x2="9" y2="5.8" stroke="#00ff41" stroke-width="0.3" opacity="0.5"/>
+        <!-- body -->
+        <rect x="4" y="7.5" width="7" height="5.5" rx="1" fill="#001200" stroke="#00ff41" stroke-width="0.35"/>
+        <!-- chest circuit lines -->
+        <line x1="5" y1="9"  x2="10" y2="9"  stroke="#00ff4144" stroke-width="0.3"/>
+        <line x1="5" y1="10.5" x2="10" y2="10.5" stroke="#00ff4133" stroke-width="0.2"/>
+        <circle cx="7.5" cy="9.8" r="0.6" fill="#00ff41" opacity="0.7"/>
+        <!-- arms -->
+        <rect x="1" y="8" width="2.5" height="1" rx="0.5" fill="#001800" stroke="#00ff4166" stroke-width="0.3"/>
+        <rect x="11.5" y="8" width="2.5" height="1" rx="0.5" fill="#001800" stroke="#00ff4166" stroke-width="0.3"/>
+        <!-- legs -->
+        <rect x="5"   y="13" width="2" height="4" rx="0.5" fill="#001200" stroke="#00ff4155" stroke-width="0.3"/>
+        <rect x="8"   y="13" width="2" height="4" rx="0.5" fill="#001200" stroke="#00ff4155" stroke-width="0.3"/>
       </svg>
-      <div class="wakeup-msg">
-        <span style="color:#ff0040;font-size:12px;">⚠ SUBJECT 47 — REGAINING CONSCIOUSNESS</span>
-        <span style="margin-top:16px;">YOUR HEAD THROBS. COLD METAL TABLE.</span>
-        <span>TUBES. MACHINES. A BLINDING WHITE ROOM.</span>
-        <span style="margin-top:12px;color:#ffdd00;">ALIEN ENTITY APPROACHES...</span>
-        <span style="margin-top:16px;font-size:8px;color:#00ff41;">"WE STUDY HUMAN LANGUAGE UNIT."</span>
-        <span style="font-size:8px;color:#00ff41;">"ANSWER CORRECTLY OR FACE DISSECTION."</span>
-        <span style="font-size:8px;color:#00ff41;">"4 FAILURES = DISSECTION ZONE."</span>
-        <span style="font-size:8px;color:#00ff41;">"3 LEVELS. SURVIVE THEM ALL."</span>
-      </div>
-      <div class="specimen-tag">SPECIMEN TAG: H-47 | PLANET: EARTH | STATUS: TEST SUBJECT</div>
-      <button class="restart-btn" onclick="startLab()" style="margin-top:10px;">BEGIN EXPERIMENT</button>
+    </div>
+
+    <!-- TERMINAL TEXT BLOCK -->
+    <div class="wt-terminal">
+      <div class="wt-line"><span class="wt-prompt">&gt;</span> <span style="color:#ff0040;">CAPTURE CONFIRMED. SUBJECT H-47.</span></div>
+      <div class="wt-line"><span class="wt-prompt">&gt;</span> LOCATION: OBSERVATION DECK Ξ-9. ORBIT: UNKNOWN.</div>
+      <div class="wt-line wt-gap"><span class="wt-prompt">&gt;</span> <span style="color:#ffdd00;">DIRECTIVE: LANGUAGE COMPLIANCE TEST.</span></div>
+      <div class="wt-line"><span class="wt-prompt">&gt;</span> ANSWER CORRECTLY OR FACE <span style="color:#ff0040;">DISSECTION PROTOCOL.</span></div>
+      <div class="wt-line"><span class="wt-prompt">&gt;</span> <span style="color:#335533;">4 FAILURES = TERMINATION.</span> 3 LEVELS.</div>
+      <div class="wt-cursor-line"><span class="wt-prompt">&gt;</span> AWAITING SUBJECT COMPLIANCE<span class="wt-cursor">█</span></div>
+    </div>
+
+    <!-- SPECIMEN TAG -->
+    <div class="wt-tag">
+      <span>TAG:H-47</span>
+      <span>|</span>
+      <span>PLANET:EARTH</span>
+      <span>|</span>
+      <span class="wt-blink" style="color:#ff0040;">STATUS:TEST_SUBJECT</span>
+    </div>
+
+    <!-- BEGIN BUTTON — spiderverse style green -->
+    <div class="button-wrapper" style="margin-top:4px;">
+      <button class="spiderverse-button" onclick="startLab()">
+        BEGIN EXPERIMENT
+        <div class="glitch-layers">
+          <div class="glitch-layer layer-1">BEGIN EXPERIMENT</div>
+          <div class="glitch-layer layer-2">BEGIN EXPERIMENT</div>
+        </div>
+        <div class="btn-noise"></div>
+        <div class="glitch-slice"></div>
+      </button>
     </div>
   </div>
 </div>
@@ -452,7 +622,7 @@
     <div class="alien-panel">
       <div class="alien-label" style="z-index:1;">EXPERIMENTER Ξ-9</div>
       <div style="position:relative;width:160px;height:160px;border:2px solid var(--border);background:#000a00;overflow:hidden;z-index:1;">
-        <video id="alienVideo" src="alien.mp4" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;filter:saturate(1.3) hue-rotate(10deg) brightness(0.9);display:block;"></video>
+        <video id="alienVideo" src="/gamingid/assets/alien.mp4" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;filter:saturate(1.3) hue-rotate(10deg) brightness(0.9);display:block;"></video>
         <div style="position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.25) 0px,rgba(0,0,0,0.25) 1px,transparent 1px,transparent 3px);"></div>
         <div style="position:absolute;inset:0;pointer-events:none;background:rgba(0,40,0,0.25);box-shadow:inset 0 0 20px rgba(0,255,65,0.3);"></div>
       </div>
@@ -523,7 +693,17 @@
       <span style="color:#ff0040;">THE BLADE IS COLD.</span><br>
       <span style="color:#440000;font-size:6px;">EXPERIMENT LOG: SUBJECT H-47 — TERMINATED.</span>
     </div>
-    <button class="restart-btn" style="border-color:var(--red);color:var(--red);box-shadow:0 0 8px var(--red);" onclick="restart()">TRY AGAIN</button>
+    <div class="button-wrapper">
+      <button class="spiderverse-button" onclick="restart()" style="background:#ff0040;text-shadow:none;">
+        TRY AGAIN
+        <div class="glitch-layers">
+          <div class="glitch-layer layer-1" style="background:#ff0040;">TRY AGAIN</div>
+          <div class="glitch-layer layer-2" style="background:#ff0040;">TRY AGAIN</div>
+        </div>
+        <div class="btn-noise"></div>
+        <div class="glitch-slice" style="background:#ff0040;"></div>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -539,14 +719,23 @@
     <span style="color:#446644;font-size:6px;">THEY WILL RETURN. THEY ALWAYS DO.</span>
   </div>
   <div style="font-size:7px;color:#335533;margin-top:8px;" id="winScore"></div>
-  <button class="restart-btn" onclick="restart()">PLAY AGAIN</button>
+  <div class="button-wrapper">
+      <button class="spiderverse-button" onclick="restart()">
+        PLAY AGAIN
+        <div class="glitch-layers">
+          <div class="glitch-layer layer-1">PLAY AGAIN</div>
+          <div class="glitch-layer layer-2">PLAY AGAIN</div>
+        </div>
+        <div class="btn-noise"></div>
+        <div class="glitch-slice"></div>
+      </button>
+    </div>
 </div>
 
 <script>
 // ===== VIDEO INTRO =====
 function onStartGame() {
   playSound('start');
-  startBgMusic();
   document.getElementById('startVideo1').pause();
   showScreen('video-start2-screen');
   const s2 = document.getElementById('startVideo2');
@@ -565,13 +754,13 @@ function triggerLightBang() {
   playSound('meteor');
   // Flash white — the light bang — then go to wakeup
   const flash = document.getElementById('flashOverlay');
-  flash.style.transition = 'opacity 0.1s';
-  flash.style.opacity = '1';
+  flash.style.transition = 'opacity 0.15s';
+  flash.style.opacity = '0.42';
   setTimeout(() => {
-    flash.style.transition = 'opacity 3s';
+    flash.style.transition = 'opacity 2.5s';
     flash.style.opacity = '0';
     showScreen('wakeup-screen');
-  }, 1000);
+  }, 700);
 }
 
 const level1Bank = [
@@ -689,13 +878,52 @@ function showScreen(id) {
   document.getElementById(id).classList.add('active');
 }
 
-// ===== SOUND ENGINE (Web Audio API — no external files needed) =====
+// ===== iOS / MOBILE AUDIO UNLOCK =====
+// iOS Safari demands AudioContext creation AND buffer playback happen
+// inside a synchronous user-gesture handler — not in a promise callback.
 let audioCtx = null;
+let _audioUnlocked = false;
+
+function _unlockAudio() {
+  if (_audioUnlocked) return;
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    // Play a real (silent) 4096-sample buffer synchronously — iOS requirement
+    const buf = audioCtx.createBuffer(1, 4096, audioCtx.sampleRate || 44100);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.connect(audioCtx.destination);
+    src.start(0);
+    _audioUnlocked = true;
+  } catch(e) {}
+}
+
+// Capture-phase listeners ensure we fire before anything else on the gesture
+['touchstart','touchend','pointerdown','mousedown','click','keydown'].forEach(function(ev) {
+  document.addEventListener(ev, _unlockAudio, { passive: true, capture: true });
+});
+
 function getAudioCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
 }
+
+// Also unlock BGM: when onStartGame fires the AudioContext may still be new,
+// so startBgMusic defers one tick to let iOS resume settle
+function startBgMusicIOS() {
+  if (bgMusicRunning) return;
+  if (!audioCtx || audioCtx.state !== 'running') {
+    setTimeout(startBgMusic, 80);
+  } else {
+    startBgMusic();
+  }
+}
+
+// ===== SOUND ENGINE (Web Audio API — no external files needed) =====
 function playSound(type) {
   try {
     const ctx = getAudioCtx();
@@ -1093,6 +1321,7 @@ function resetLabUI() {
   document.getElementById('statusText').style.color = 'var(--green)';
   document.getElementById('threatLevel').textContent = 'LOW';
   document.getElementById('threatLevel').style.color = 'var(--yellow)';
+  clearMistakeEscalation();
 }
 
 // ===== TIMER =====
@@ -1224,7 +1453,10 @@ function handleAnswer(idx, btn) {
 }
 
 function disableAll() { document.querySelectorAll('.option-btn,.fitb-btn').forEach(b => b.style.pointerEvents = 'none'); }
-function updateLives() { for (let i=0;i<4;i++) document.getElementById(`pip${i}`).classList.toggle('dead', i>=(4-wrongs)); }
+function updateLives() {
+  for (let i=0;i<4;i++) document.getElementById('pip'+i).classList.toggle('dead', i>=(4-wrongs));
+  applyMistakeEscalation(wrongs);
+}
 function updateThreat() {
   const t = wrongs===0?'LOW':wrongs===1?'MEDIUM':wrongs===2?'HIGH':'CRITICAL';
   const c = {LOW:'#ffdd00',MEDIUM:'#ff8800',HIGH:'#ff4400',CRITICAL:'#ff0040'};
@@ -1241,6 +1473,37 @@ function flashStatic() {
   so.style.transition = 'opacity 0.05s'; so.style.opacity = '1';
   setTimeout(() => { so.style.opacity = '0'; }, 300);
 }
+
+// ===== MISTAKE ESCALATION — flicker + red bg + text distort =====
+function applyMistakeEscalation(n) {
+  const overlay = document.getElementById('dangerOverlay');
+  const lab = document.getElementById('lab-screen');
+  const qText = document.getElementById('qText');
+  if (lab) lab.style.animation = '';
+  if (qText) qText.classList.remove('distort-1','distort-2','distort-3');
+
+  if (!overlay) return;
+  if (n <= 0) {
+    overlay.style.opacity = '0';
+    overlay.style.background = 'none';
+    return;
+  }
+  if (n === 1) {
+    overlay.style.opacity = '1';
+    overlay.style.background = 'radial-gradient(ellipse at center,transparent 25%,rgba(160,0,0,0.19) 100%)';
+    if (qText) qText.classList.add('distort-1');
+  } else if (n === 2) {
+    overlay.style.opacity = '1';
+    overlay.style.background = 'radial-gradient(ellipse at center,rgba(160,0,0,0.17) 0%,rgba(210,0,0,0.22) 100%)';
+    if (qText) qText.classList.add('distort-2');
+  } else {
+    overlay.style.opacity = '1';
+    overlay.style.background = 'radial-gradient(ellipse at center,rgba(200,0,0,0.18) 0%,rgba(255,0,0,0.26) 100%)';
+    if (lab) lab.style.animation = 'screenFlicker3 0.28s steps(1) infinite';
+    if (qText) qText.classList.add('distort-3');
+  }
+}
+function clearMistakeEscalation() { applyMistakeEscalation(0); }
 
 // ===== LEVEL COMPLETE =====
 function levelComplete() {
@@ -1309,6 +1572,7 @@ function endGame(won) {
 function restart() {
   stopTimer();
   playSound('tryagain');
+  clearMistakeEscalation();
   const dv = document.getElementById('dissectionVideo');
   if (dv) { dv.pause(); dv.currentTime = 0; }
   const pv = document.getElementById('passVideo');
@@ -1318,10 +1582,35 @@ function restart() {
   s2.pause(); s2.currentTime = 0; s2.onended = null;
   const s1 = document.getElementById('startVideo1');
   s1.currentTime = 0; s1.play().catch(() => {});
+  // Restart BGM from scratch
+  stopBgMusic();
+  setTimeout(startBgMusic, 100);
   showScreen('video-start-screen');
 }
+
+// ===== AUTO-START BGM =====
+// Start immediately on desktop; on iOS we must wait for the first user touch
+// because AudioContext is blocked until a gesture.
+(function() {
+  function tryAutoStart() {
+    if (bgMusicRunning) return;
+    try {
+      startBgMusic();
+    } catch(e) {}
+  }
+  // Try right away (works on desktop/Android)
+  setTimeout(tryAutoStart, 300);
+  // Fallback: first touch on iOS unlocks audio, then start BGM
+  function onFirstTouch() {
+    setTimeout(tryAutoStart, 80);
+    document.removeEventListener('touchstart', onFirstTouch, true);
+    document.removeEventListener('pointerdown', onFirstTouch, true);
+    document.removeEventListener('click', onFirstTouch, true);
+  }
+  document.addEventListener('touchstart', onFirstTouch, { once: true, capture: true, passive: true });
+  document.addEventListener('pointerdown', onFirstTouch, { once: true, capture: true, passive: true });
+  document.addEventListener('click', onFirstTouch, { once: true, capture: true, passive: true });
+})();
 </script>
 </body>
-
 </html>
-
